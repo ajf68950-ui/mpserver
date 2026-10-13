@@ -1,0 +1,58 @@
+# Statusbord - scorebord aan de zijkant van het scherm.
+# Kleuren met & (bijv. &a groen, &e geel, &b lichtblauw, &l vet).
+# Na een wijziging: /statusbord herladen
+#
+# Tekens die je in de regels kunt gebruiken:
+#   {speler} {online} {max} {tps} {ping} {wereld} {geld}
+#   {leven} {x} {y} {z} {tijd}
+#   {helm} {borst} {broek} {schoenen}   (soort armor + hoeveel % hij nog heel is)
+# Ook PlaceholderAPI-tekens werken, bijv. %player_name%.
+
+titel: '&b&lMeedia SMP'
+
+# Hoe vaak het bord ververst, in ticks (20 = 1 seconde)
+verversen-ticks: 20
+
+# Maximaal 15 regels. Lege regels mogen.
+regels:
+  - '&8&m                        '
+  - '&e&lServer'
+  - ' &fSpelers: &a{online}&7/&f{max}'
+  - ' &fTPS: {tps} &8| &fPing: {ping}'
+  - ''
+  - '&e&l{speler}'
+  - ' &fWereld: &b{wereld}'
+  - ' &fGeld: &a${geld}'
+  - ''
+  - '&e&lArmor'
+  - ' &fHelm: {helm}'
+  - ' &fBorst: {borst}'
+  - ' &fBroek: {broek}'
+  - ' &fSchoenen: {schoenen}'
+  - '&8&m                        '
+
+# Hoe werelden op het bord heten (wereld-map-naam: naam op het bord)
+wereldnamen:
+  MeediaSMP: Survival
+  MeediaSMP_nether: Nether
+  MeediaSMP_the_end: The End
+  SuperiorWorld: Skyblock
+  SuperiorWorld_nether: Skyblock Nether
+  SuperiorWorld_the_end: Skyblock End
+  oneblock_world: OneBlock
+  oneblock_world_nether: OneBlock Nether
+  oneblock_world_the_end: OneBlock End
+  PvP: PvP
+  Hardcore: Hardcore
+  parkour: Parkour
+  Buildideas: Bouwideeen
+
+# In deze werelden wordt het bord niet getoond
+uit-in-werelden: []
+
+# Teksten
+tekst:
+  geen-armor: '&7geen'
+  aan: '&aJe scorebord staat aan.'
+  uit: '&eJe scorebord staat uit. Typ /statusbord om hem weer aan te zetten.'
+  herladen: '&aStatusbord is herladen.'

@@ -1,0 +1,27 @@
+name: Vaulty
+version: '${project.version}'
+main: vaulty.Vaulty
+api-version: '26.2'
+description: Kluis per speler met spelersmarkt, te bekijken en te gebruiken via de website.
+depend: [Vault]
+softdepend: [Essentials]
+# Eerder laden dan de oude naam van deze plugin, zodat /kluis en /koppel van Vaulty zijn.
+loadbefore: [MeediaKluis]
+commands:
+  kluis:
+    description: Open je kluis
+    usage: /kluis [nummer [naam] | kopen | sorteer | naam <nummer> <naam> | <speler> [nummer]]
+    aliases: [vault, vaulty]
+  koppel:
+    description: Koppel je Minecraft-naam aan je account op de website
+    usage: /koppel <code>
+permissions:
+  vaulty.use:
+    description: /kluis gebruiken
+    default: true
+  vaulty.koppel:
+    description: /koppel gebruiken
+    default: true
+  vaulty.admin:
+    description: De kluis van andere spelers openen
+    default: op

@@ -1,0 +1,18 @@
+name: Statusbord
+version: '${project.version}'
+main: statusbord.Statusbord
+api-version: '1.21'
+description: Scorebord aan de zijkant met serverinfo, wereld, geld en armor.
+softdepend: [Vault, PlaceholderAPI]
+commands:
+  statusbord:
+    description: Zet je scorebord aan of uit. Beheer - /statusbord herladen
+    aliases: [bord]
+    usage: /statusbord [herladen]
+permissions:
+  statusbord.zien:
+    description: Mag het scorebord zien
+    default: true
+  statusbord.admin:
+    description: Mag de instellingen herladen
+    default: op

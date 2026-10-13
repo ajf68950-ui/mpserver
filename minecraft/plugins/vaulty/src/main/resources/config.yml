@@ -1,0 +1,33 @@
+# Vaulty: kluis per speler, gekoppeld aan de website.
+
+web:
+  # De website praat via deze poort met de plugin. Alleen bereikbaar op deze pc.
+  host: 127.0.0.1
+  poort: 8095
+  # Wordt automatisch aangemaakt. De website leest dit zelf uit dit bestand.
+  token: ''
+
+kluis:
+  # Aantal dubbele kisten (54 vakken) waarmee iedereen begint.
+  start-kisten: 1
+  # Maximaal aantal kisten per speler (hoogstens 21).
+  max-kisten: 10
+  # Prijs voor kist 2, 3, 4, 5 (enzovoort). De laatste prijs geldt voor alle volgende kisten.
+  # Kist 2 = upgrade 1, kist 3 = upgrade 2, enzovoort.
+  prijs-extra-kist: [25000, 1000000, 2500000, 5000000, 7500000, 10000000, 15000000, 20000000, 30000000]
+  # In deze werelden werkt /kluis niet (zodat je geen spullen meeneemt naar bijv. hardcore).
+  geblokkeerde-werelden: [hardcore, pvp]
+
+koppelen:
+  # Hoe lang een koppelcode geldig is, in minuten.
+  geldig-minuten: 10
+
+markt:
+  # Spelersmarkt op de website: spelers zetten spullen uit hun kluis te koop voor anderen.
+  aan: true
+  # Hoeveel aanbiedingen een speler tegelijk mag hebben.
+  max-per-speler: 10
+  # Hoogste prijs die je mag vragen.
+  max-prijs: 100000000
+  # Percentage dat de server inhoudt bij elke verkoop (0 = niets). Haalt geld uit de economie.
+  belasting-procent: 0
