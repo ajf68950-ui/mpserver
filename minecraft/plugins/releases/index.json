@@ -1,0 +1,19 @@
+{
+  "bijgewerkt": "2026-10-13",
+  "plugins": [
+    {
+      "naam": "Vaulty",
+      "versie": "1.1.0",
+      "bestand": "Vaulty-1.1.0.jar",
+      "sha1": "b9b9055a1de7d7b6af1eeb3a208664d68b113711",
+      "minecraft": "26.2"
+    },
+    {
+      "naam": "Statusbord",
+      "versie": "1.0.0",
+      "bestand": "Statusbord-1.0.0.jar",
+      "sha1": "4ab37f91bfe22d6b0d8926c29630b2c432b1cdb3",
+      "minecraft": "26.2"
+    }
+  ]
+}

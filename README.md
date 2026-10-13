@@ -13,8 +13,9 @@ Eigen plugins voor de Meedia SMP-server (Paper 26.2, Java 25).
 
 ### Downloaden
 
-De kant-en-klare jars staan bij de [releases](../../releases) met een tag die begint met `minecraft-plugins-`.
-`Update-plugins.bat` op de server haalt nieuwe versies hier automatisch op.
+De kant-en-klare jars staan in [`minecraft/plugins/releases`](minecraft/plugins/releases), met een
+`index.json` die per plugin de nieuwste versie en de controlecode (SHA-1) noemt.
+`Update-plugins.bat` op de server leest die index en haalt nieuwe versies automatisch op.
 
 ### Zelf bouwen
 
