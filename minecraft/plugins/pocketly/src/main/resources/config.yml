@@ -1,0 +1,45 @@
+# Pocketly - drops gaan automatisch in je inventaris.
+# Na aanpassen: /pickup reload (of de server herstarten).
+
+# Werelden waarin auto-pickup werkt (hoofdlettergevoelig, zoals in /mv list).
+# SuperiorWorld = skyblock (SuperiorSkyblock2), oneblock_world = OneBlock (BentoBox/AOneBlock).
+werelden:
+  - SuperiorWorld
+  - SuperiorWorld_nether
+  - SuperiorWorld_the_end
+  - oneblock_world
+  - oneblock_world_nether
+  - oneblock_world_the_end
+
+# Staat auto-pickup aan voor spelers die nog nooit /pickup hebben gebruikt?
+standaard-aan: true
+
+# Wat er in je inventaris gaat:
+blokken: true          # drops van blokken die je kapot maakt
+mobs: true             # drops van mobs die jij doodt
+xp-direct: true        # XP direct naar de speler (repareert ook Mending-spullen)
+
+# Vangt drops op die andere plugins zelf laten vallen bij een blok dat jij breekt
+# (bijvoorbeeld OneBlock-loot uit verdacht zand/grind).
+extra-opvang: true
+
+# Zacht oppak-geluidje als er iets in je inventaris gaat.
+geluid: true
+
+# Melding in de actiebalk als je inventaris vol is (de rest blijft dan gewoon op de grond liggen).
+vol-melding: true
+
+berichten:
+  aan: '&aAuto-pickup staat &2aan&a. Drops gaan direct in je inventaris.'
+  uit: '&eAuto-pickup staat &6uit&e. Drops vallen weer op de grond.'
+  status-aan: '&7Auto-pickup staat &2aan&7.'
+  status-uit: '&7Auto-pickup staat &6uit&7.'
+  alleen-hier: '&7(Werkt alleen in skyblock en OneBlock.)'
+  vol: '&cJe inventaris is vol!'
+  ander-aan: '&aAuto-pickup staat nu aan voor &2{speler}&a.'
+  ander-uit: '&eAuto-pickup staat nu uit voor &6{speler}&e.'
+  niet-gevonden: '&cSpeler {speler} is niet online.'
+  geen-recht: '&cDaar heb je geen toestemming voor.'
+  herladen: '&aPocketly-config herladen.'
+  gebruik: '&7Gebruik: &f/pickup &7(aan/uit wisselen), &f/pickup aan&7, &f/pickup uit&7, &f/pickup status'
+  gebruik-admin: '&7Admin: &f/pickup aan <speler>&7, &f/pickup uit <speler>&7, &f/pickup reload'

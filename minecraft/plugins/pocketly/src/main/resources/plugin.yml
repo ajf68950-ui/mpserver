@@ -1,0 +1,19 @@
+name: Pocketly
+version: '${project.version}'
+main: pocketly.Pocketly
+api-version: '26.2'
+description: Drops gaan automatisch in je inventaris (skyblock en OneBlock), per speler aan/uit te zetten.
+softdepend: [SuperiorSkyblock2, BentoBox]
+commands:
+  pickup:
+    description: Zet automatisch oppakken aan of uit.
+    usage: /pickup [aan|uit|status]
+    aliases: [autopickup, pocketly]
+    permission: pocketly.use
+permissions:
+  pocketly.use:
+    description: Auto-pickup gebruiken en aan/uit zetten.
+    default: true
+  pocketly.admin:
+    description: Config herladen en auto-pickup voor andere spelers aan/uit zetten.
+    default: op

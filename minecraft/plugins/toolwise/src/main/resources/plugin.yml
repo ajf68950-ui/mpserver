@@ -1,0 +1,17 @@
+name: Toolwise
+version: '${project.version}'
+main: toolwise.Toolwise
+api-version: '26.2'
+description: Pakt automatisch het beste gereedschap bij het hakken/minen en het beste wapen bij het aanvallen.
+commands:
+  toolwise:
+    description: Automatisch wisselen van gereedschap en wapens aan- of uitzetten.
+    usage: /toolwise [aan | uit | gereedschap [aan|uit] | wapens [aan|uit] | status | reload]
+    aliases: [tw, autotool]
+permissions:
+  toolwise.use:
+    description: Automatisch wisselen gebruiken en zelf aan/uit zetten.
+    default: true
+  toolwise.admin:
+    description: /toolwise reload
+    default: op

@@ -1,0 +1,38 @@
+# Toolwise - pakt automatisch het beste gereedschap of wapen uit je hotbar.
+# Na het aanpassen: /toolwise reload (of de server herstarten).
+
+# Hoe het voor een speler staat zolang hij het zelf nog niet heeft omgezet met /toolwise.
+standaard:
+  gereedschap: true   # bij hakken/minen/graven het beste gereedschap pakken
+  wapens: true        # bij aanvallen het beste wapen pakken
+
+# true  = alleen wisselen als je iets ongeschikts vasthoudt. Houd je al een passend gereedschap
+#         of wapen vast (bijv. bewust een Silk Touch-pickaxe of een bijl), dan blijft dat in je hand.
+# false = altijd naar het allerbeste wisselen.
+alleen-als-ongeschikt: true
+
+# false = alleen uit de hotbar (vak 1-9) pakken.
+# true  = ook uit de rest van de inventaris; het item gaat dan naar een leeg hotbar-vak
+#         of ruilt van plek met wat je vasthoudt.
+ook-uit-inventaris: false
+
+# Shift ingedrukt houden = even niet wisselen.
+niet-bij-sluipen: true
+
+# Ook wisselen als je een andere speler aanvalt.
+wapens-tegen-spelers: true
+
+# Gereedschap en wapens met zoveel duurzaamheid of minder over worden niet gepakt (0 = uit).
+bescherm-duurzaamheid: 10
+
+# Welk wapen het beste is:
+#   zwaard = zwaarden eerst (snel, met zwaai-aanval), daarna bijl/speer/mace op schade
+#   schade = meeste schade per klap (vaak een bijl)
+#   dps    = meeste schade per seconde (schade x aanvalssnelheid)
+wapen-voorkeur: zwaard
+
+# Kort melden in de actiebalk welk item gepakt is.
+melding: false
+
+# Werelden waar Toolwise niets doet (naam zoals in Multiverse).
+uitgeschakelde-werelden: []

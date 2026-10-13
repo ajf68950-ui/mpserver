@@ -14,6 +14,20 @@
       "bestand": "Statusbord-1.0.0.jar",
       "sha1": "4ab37f91bfe22d6b0d8926c29630b2c432b1cdb3",
       "minecraft": "26.2"
+    },
+    {
+      "naam": "Pocketly",
+      "versie": "1.0.0",
+      "bestand": "Pocketly-1.0.0.jar",
+      "sha1": "e1d5005b2a8a8638aaa695b002c0474d3bc9983a",
+      "minecraft": "26.2"
+    },
+    {
+      "naam": "Toolwise",
+      "versie": "1.0.0",
+      "bestand": "Toolwise-1.0.0.jar",
+      "sha1": "2ea4d76a0302ca1dcbd766006af235166336ce38",
+      "minecraft": "26.2"
     }
   ]
 }
