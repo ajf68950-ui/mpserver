@@ -95,6 +95,20 @@ final class WebApi {
                 result = sync(() -> top(10));
             } else if (path.equals("/admin/spelers")) {
                 result = sync(this::spelers);
+            } else if (path.equals("/admin/geld") && method.equals("POST")) {
+                result = sync(() -> adminGeld(b));
+            } else if (path.equals("/admin/item") && method.equals("POST")) {
+                result = sync(() -> adminItem(b));
+            } else if (path.equals("/admin/uuid")) {
+                result = sync(() -> adminUuid(b));
+            } else if (path.equals("/admin/quests")) {
+                result = sync(() -> plugin.quests().alles());
+            } else if (path.equals("/admin/quest") && method.equals("POST")) {
+                result = sync(() -> { String f = plugin.quests().opslaan(b); return f != null ? error(f) : plugin.quests().alles(); });
+            } else if (path.equals("/admin/quest-verwijder") && method.equals("POST")) {
+                result = sync(() -> plugin.quests().verwijder(str(b, "id")) ? plugin.quests().alles() : error("Deze quest bestaat niet (meer)."));
+            } else if (path.equals("/admin/opties")) {
+                result = sync(this::opties);
             } else if (path.equals("/admin/geef") && method.equals("POST")) {
                 result = sync(() -> adminGeef(b));
             } else if (parts.length >= 2 && parts[0].equals("player")) {
@@ -252,9 +266,106 @@ final class WebApi {
             e.addProperty("verdiend", sp.verdiend);
             e.addProperty("uitgegeven", sp.uitgegeven);
             e.addProperty("online", Bukkit.getPlayer(sp.uuid) != null);
+            Economy eco = plugin.economy();
+            if (eco != null) {
+                try { e.addProperty("geld", eco.getBalance(Bukkit.getOfflinePlayer(sp.uuid))); } catch (Exception ignored) { }
+            }
             arr.add(e);
         }
         o.add("spelers", arr);
+        return o;
+    }
+
+    private JsonObject adminGeld(JsonObject b) {
+        Economy eco = plugin.economy();
+        if (eco == null) return error("Er is geen economy (Vault) gevonden.");
+        String naam = str(b, "speler"), actie = str(b, "actie");
+        double n;
+        try { n = b.get("bedrag").getAsDouble(); } catch (Exception e) { return error("Vul een geldig bedrag in."); }
+        if (!(n >= 0) || Double.isInfinite(n)) return error("Vul een bedrag van 0 of meer in.");
+        n = Math.round(n * 100.0) / 100.0;
+        Saldi.Speler sp = plugin.zoek(naam);
+        if (sp == null) return error("Speler " + naam + " is niet bekend op deze server.");
+        OfflinePlayer op = Bukkit.getOfflinePlayer(sp.uuid);
+        if (!eco.hasAccount(op)) eco.createPlayerAccount(op);
+        double nu = eco.getBalance(op);
+        boolean ok = switch (actie) {
+            case "geef" -> eco.depositPlayer(op, n).transactionSuccess();
+            case "pak" -> eco.withdrawPlayer(op, Math.min(n, nu)).transactionSuccess();
+            case "zet" -> n >= nu ? eco.depositPlayer(op, n - nu).transactionSuccess() : eco.withdrawPlayer(op, nu - n).transactionSuccess();
+            default -> false;
+        };
+        if (!ok) return error("Dat is niet gelukt.");
+        plugin.getLogger().info("Beheer (website): geld " + actie + " " + n + " voor " + sp.naam + ", nu " + eco.getBalance(op));
+        if (n > 0 && !actie.equals("zet")) notify(sp.uuid, actie.equals("geef") ? "&aJe kreeg $" + Muntly.fmt(Math.round(n)) + " van een beheerder." : "&cEr is $" + Muntly.fmt(Math.round(n)) + " afgehaald door een beheerder.");
+        JsonObject o = new JsonObject();
+        o.addProperty("naam", sp.naam);
+        o.addProperty("geld", eco.getBalance(op));
+        return o;
+    }
+
+    /** Een speciaal item uit de muntenwinkel gratis in de kluis van een speler leggen. */
+    private JsonObject adminItem(JsonObject b) {
+        Winkel.Artikel a = plugin.winkel().artikelen().get(str(b, "id"));
+        if (a == null) return error("Dit item bestaat niet (meer).");
+        Saldi.Speler sp = plugin.zoek(str(b, "speler"));
+        if (sp == null) return error("Speler " + str(b, "speler") + " is niet bekend op deze server.");
+        int n = 1;
+        try { if (b.has("aantal")) n = Math.max(1, Math.min(54, b.get("aantal").getAsInt())); } catch (Exception ignored) { }
+        java.util.List<ItemStack> items = new java.util.ArrayList<>();
+        for (int i = 0; i < n; i++) items.add(a.item.clone());
+        Plugin v = vaulty();
+        if (v == null) return error("De kluis (Vaulty) is niet beschikbaar.");
+        try {
+            Object r = v.getClass().getMethod("deliverToKluis", UUID.class, String.class, List.class).invoke(v, sp.uuid, sp.naam, items);
+            if (r != null) return error(String.valueOf(r));
+        } catch (NoSuchMethodException e) {
+            return error("Dit werkt vanaf Vaulty 1.2.0.");
+        } catch (Exception e) {
+            return error("Er ging iets mis met de kluis.");
+        }
+        plugin.getLogger().info("Beheer (website): " + n + "x " + a.id + " gratis in de kluis van " + sp.naam);
+        notify(sp.uuid, "&aEen beheerder legde " + n + "x " + Winkel.naam(a.item) + " in je kluis.");
+        JsonObject o = new JsonObject();
+        o.addProperty("naam", sp.naam);
+        o.addProperty("ok", true);
+        return o;
+    }
+
+    private JsonObject adminUuid(JsonObject b) {
+        Saldi.Speler sp = plugin.zoek(str(b, "name"));
+        if (sp == null) return error("Speler " + str(b, "name") + " is niet bekend op deze server. Is hij al eens online geweest?");
+        JsonObject o = new JsonObject();
+        o.addProperty("uuid", sp.uuid.toString());
+        o.addProperty("naam", sp.naam);
+        return o;
+    }
+
+    /** Lijsten met Minecraft-namen voor de keuzelijsten in het beheer. */
+    private JsonObject opties() {
+        JsonObject o = new JsonObject();
+        JsonArray items = new JsonArray(), blokken = new JsonArray(), mobs = new JsonArray();
+        for (org.bukkit.Material m : org.bukkit.Material.values()) {
+            if (m.isLegacy() || m.isAir()) continue;
+            if (m.isItem()) items.add(m.getKey().getKey());
+            if (m.isBlock()) blokken.add(m.getKey().getKey());
+        }
+        for (org.bukkit.entity.EntityType t : org.bukkit.entity.EntityType.values()) {
+            if (t.isAlive() && t.isSpawnable() && t != org.bukkit.entity.EntityType.PLAYER && t != org.bukkit.entity.EntityType.ARMOR_STAND) mobs.add(t.getKey().getKey());
+        }
+        o.add("items", items);
+        o.add("blokken", blokken);
+        o.add("mobs", mobs);
+        JsonArray speciaal = new JsonArray();
+        for (Winkel.Artikel a : plugin.winkel().artikelen().values()) {
+            JsonObject x = new JsonObject();
+            x.addProperty("id", a.id);
+            x.addProperty("prijs", a.prijs);
+            x.addProperty("zeldzaamheid", a.zeldzaamheid.id);
+            x.add("item", plugin.winkel().describe(a.item));
+            speciaal.add(x);
+        }
+        o.add("speciaal", speciaal);
         return o;
     }
 

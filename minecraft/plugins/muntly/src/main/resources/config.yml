@@ -23,6 +23,15 @@ verdienen:
     # Sla je een dag over, dan begint de reeks weer bij dag 1.
     beloningen: [5, 5, 10, 10, 15, 15, 25]
 
+quests:
+  # Hoeveel quests een speler tegelijk mag doen.
+  max-tegelijk: 3
+  # In deze werelden telt quest-voortgang niet (bijv. de creative plotwereld).
+  # Voortgang telt sowieso alleen in survival en adventure.
+  niet-in-werelden: [plots]
+  # Tellen mobs uit een spawner mee voor "mobs doden"? (false = nee, tegen mob-farms)
+  spawner-mobs-tellen: false
+
 # Melding aan iedereen als iemand iets legendarisch uit een lootbox haalt.
 legendarisch-melden: true
 

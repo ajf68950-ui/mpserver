@@ -1,0 +1,94 @@
+# Muntly - quests. Aan te passen in het beheer van de website (tabblad Quests) of hier; daarna /quests herladen.
+# soort: breken, plaatsen, doden, vissen, craften, inleveren    herhalen: nooit, dagelijks of wekelijks
+# doel: lijst met Minecraft-namen (blokken, items of mobs). Leeg = alles telt (niet bij inleveren).
+quests:
+  houthakker:
+    naam: Houthakker
+    beschrijving: De bouwers bij de spawn hebben hout nodig.
+    soort: breken
+    doel: [oak_log, birch_log, spruce_log, jungle_log, acacia_log, dark_oak_log, mangrove_log, cherry_log, pale_oak_log]
+    aantal: 64
+    herhalen: dagelijks
+    beloning: {munten: 8, geld: 750}
+    actief: true
+  mijnwerker:
+    naam: Mijnwerker
+    beschrijving: Hak een flinke berg steen weg.
+    soort: breken
+    doel: [stone, cobblestone, deepslate, cobbled_deepslate, andesite, diorite, granite, tuff]
+    aantal: 256
+    herhalen: dagelijks
+    beloning: {munten: 10, geld: 1000}
+    actief: true
+  boer:
+    naam: Boer
+    beschrijving: Oogst volgroeide gewassen.
+    soort: breken
+    doel: [wheat, carrots, potatoes, beetroots]
+    aantal: 64
+    herhalen: dagelijks
+    beloning: {munten: 8, geld: 750}
+    actief: true
+  zombiejager:
+    naam: Zombiejager
+    beschrijving: Houd de zombies weg bij de spelers.
+    soort: doden
+    doel: [zombie, husk, drowned, zombie_villager]
+    aantal: 25
+    herhalen: dagelijks
+    beloning: {munten: 12, geld: 1250}
+    actief: true
+  botjesverzamelaar:
+    naam: Botjesverzamelaar
+    beschrijving: Versla skeletten en spinnen.
+    soort: doden
+    doel: [skeleton, stray, spider, cave_spider]
+    aantal: 25
+    herhalen: dagelijks
+    beloning: {munten: 12, geld: 1250}
+    actief: true
+  visser:
+    naam: Visser
+    beschrijving: Vang wat vissen voor het avondeten.
+    soort: vissen
+    doel: []
+    aantal: 15
+    herhalen: dagelijks
+    beloning: {munten: 10, geld: 1000}
+    actief: true
+  smid:
+    naam: Smid
+    beschrijving: Lever ijzer in bij de smederij.
+    soort: inleveren
+    doel: [iron_ingot]
+    aantal: 32
+    herhalen: wekelijks
+    beloning: {munten: 30, geld: 4000}
+    actief: true
+  diamantzoeker:
+    naam: Diamantzoeker
+    beschrijving: Vind diamanten diep onder de grond.
+    soort: breken
+    doel: [diamond_ore, deepslate_diamond_ore]
+    aantal: 10
+    herhalen: wekelijks
+    beloning: {munten: 50, geld: 7500}
+    actief: true
+  endermanjager:
+    naam: Endermanjager
+    beschrijving: Versla endermen voor hun parels.
+    soort: doden
+    doel: [enderman]
+    aantal: 20
+    herhalen: wekelijks
+    beloning: {munten: 40, geld: 5000, item: ender_pearl, item-aantal: 8}
+    actief: true
+  eerste-stappen:
+    naam: Eerste stappen
+    beschrijving: Maak je eerste gereedschap. Eenmalig, voor nieuwe spelers.
+    soort: craften
+    doel: [wooden_pickaxe, stone_pickaxe]
+    aantal: 1
+    herhalen: nooit
+    beloning: {munten: 20, geld: 2500}
+    actief: true

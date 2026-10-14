@@ -2,13 +2,17 @@ name: Muntly
 version: '${project.version}'
 main: muntly.Muntly
 api-version: '26.2'
-description: Eigen munt (Munten) met speeltijd- en dagbeloning, muntenwinkel en lootboxen, ook te gebruiken via de website.
+description: Eigen munt (Munten) met speeltijd- en dagbeloning, muntenwinkel, lootboxen en quests, ook te gebruiken via de website.
 softdepend: [Vault, PlaceholderAPI, Vaulty]
 commands:
   munten:
     description: Je Munten, de muntenwinkel en de lootboxen.
     usage: /munten [saldo | winkel | lootbox | top | dagelijks | geef | pak | zet | herladen]
     aliases: [munt, muntly]
+  quests:
+    description: Quests voor Munten en geld.
+    usage: /quests
+    aliases: [quest, opdrachten]
 permissions:
   muntly.use:
     description: Munten verdienen en uitgeven.

@@ -25,6 +25,7 @@ public final class Muntly extends JavaPlugin {
     private Winkel winkel;
     private Verdienen verdienen;
     private Menus menus;
+    private Quests quests;
     private WebApi web;
     private Economy economy;
     private boolean economyGezocht;
@@ -43,6 +44,8 @@ public final class Muntly extends JavaPlugin {
         winkel.load();
         verdienen = new Verdienen(this);
         menus = new Menus(this);
+        quests = new Quests(this);
+        getServer().getPluginManager().registerEvents(quests, this);
         getServer().getPluginManager().registerEvents(verdienen, this);
         getServer().getPluginManager().registerEvents(menus, this);
         try {
@@ -65,11 +68,13 @@ public final class Muntly extends JavaPlugin {
     public void onDisable() {
         if (web != null) web.stop();
         if (saldi != null) saldi.saveNow();
+        if (quests != null) quests.saveNow();
     }
 
     Saldi saldi() { return saldi; }
     Winkel winkel() { return winkel; }
     Verdienen verdienen() { return verdienen; }
+    Quests quests() { return quests; }
 
     Economy economy() {
         if (economy == null && !economyGezocht) {
@@ -160,6 +165,18 @@ public final class Muntly extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         String sub = args.length > 0 ? args[0].toLowerCase(Locale.ROOT) : "";
+        if (command.getName().equalsIgnoreCase("quests")) {
+            if (sub.equals("herladen") || sub.equals("reload")) {
+                if (!sender.hasPermission("muntly.admin")) { sender.sendMessage(fout("Dat mag alleen een beheerder.")); return true; }
+                quests.load();
+                sender.sendMessage(bericht("Quests herladen: " + quests.quests().size() + "."));
+                return true;
+            }
+            if (!(sender instanceof Player p)) { sender.sendMessage("Alleen voor spelers. Beheer: /quests herladen"); return true; }
+            if (!p.hasPermission("muntly.use")) { p.sendMessage(fout("Dat mag je niet.")); return true; }
+            menus.quests(p);
+            return true;
+        }
         boolean admin = sender.hasPermission("muntly.admin");
         if (!sender.hasPermission("muntly.use") && !admin) { sender.sendMessage(fout("Dat mag je niet.")); return true; }
 
@@ -189,6 +206,7 @@ public final class Muntly extends JavaPlugin {
                 if (!admin) { sender.sendMessage(fout("Dat mag alleen een beheerder.")); return true; }
                 reloadConfig();
                 winkel.load();
+                quests.load();
                 sender.sendMessage(bericht("Config en winkel herladen: " + winkel.artikelen().size() + " items, " + winkel.lootboxen().size() + " lootboxen."));
                 return true;
             }
@@ -219,6 +237,7 @@ public final class Muntly extends JavaPlugin {
             case "" -> menus.hoofdmenu(p);
             case "winkel", "shop" -> menus.winkel(p);
             case "lootbox", "lootboxen", "kist" -> menus.lootboxen(p);
+            case "quests", "quest" -> menus.quests(p);
             case "dagelijks", "dag" -> {
                 Saldi.Speler sp = saldi.get(p.getUniqueId(), p.getName());
                 p.sendMessage(bericht("Dagen op rij: &f" + sp.reeks + "&7. Morgen inloggen geeft &e+" + munten(verdienen.beloningVoorDag(sp.reeks + 1))
@@ -230,7 +249,7 @@ public final class Muntly extends JavaPlugin {
     }
 
     private void help(CommandSender s, boolean admin) {
-        s.sendMessage(bericht("&f/munten &7menu, &f/munten saldo&7, &f/munten winkel&7, &f/munten lootbox&7, &f/munten top&7, &f/munten dagelijks"));
+        s.sendMessage(bericht("&f/munten &7menu, &f/munten saldo&7, &f/munten winkel&7, &f/munten lootbox&7, &f/munten top&7, &f/munten dagelijks&7, &f/quests"));
         if (admin) s.sendMessage(bericht("Beheer: &f/munten geef|pak|zet <speler> <aantal>&7, &f/munten herladen"));
     }
 

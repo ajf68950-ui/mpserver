@@ -85,9 +85,10 @@ final class Menus implements Listener {
         Menu m = menu(3, plugin.kleur() + "&l" + plugin.muntNaam());
         Saldi.Speler sp = plugin.saldi().get(p.getUniqueId(), p.getName());
         zet(m, 4, saldoKnop(p), null);
-        zet(m, 11, knop(Material.EMERALD, "&a&lMuntenwinkel", "&7Speciale wapens, gereedschap", "&7en armor voor Munten.", "", "&eKlik om te openen"), c -> { klik(p); winkel(p); });
-        zet(m, 13, knop(Material.ENDER_CHEST, "&d&lLootboxen", "&7Waag een gok: wat zit erin?", "", "&eKlik om te openen"), c -> { klik(p); lootboxen(p); });
-        zet(m, 15, knop(Material.GOLD_BLOCK, "&6&lToplijst", "&7Wie heeft de meeste Munten?", "", "&eKlik om te openen"), c -> { klik(p); toplijst(p); });
+        zet(m, 10, knop(Material.EMERALD, "&a&lMuntenwinkel", "&7Speciale wapens, gereedschap", "&7en armor voor Munten.", "", "&eKlik om te openen"), c -> { klik(p); winkel(p); });
+        zet(m, 12, knop(Material.ENDER_CHEST, "&d&lLootboxen", "&7Waag een gok: wat zit erin?", "", "&eKlik om te openen"), c -> { klik(p); lootboxen(p); });
+        zet(m, 14, knop(Material.WRITABLE_BOOK, "&6&lQuests", "&7Opdrachten voor Munten en geld.", "", "&eKlik om te openen"), c -> { klik(p); quests(p); });
+        zet(m, 16, knop(Material.GOLD_BLOCK, "&6&lToplijst", "&7Wie heeft de meeste Munten?", "", "&eKlik om te openen"), c -> { klik(p); toplijst(p); });
         Verdienen v = plugin.verdienen();
         List<String> info = new ArrayList<>();
         if (plugin.getConfig().getBoolean("verdienen.speeltijd.aan", true)) {
@@ -292,6 +293,29 @@ final class Menus implements Listener {
         p.openInventory(m.inv);
         o.taak = new BukkitRunnable() { @Override public void run() { o.tik(); } };
         o.taak.runTaskTimer(plugin, 2L, 1L);
+    }
+
+    // ---------------------------------------------------------------- quests
+    void quests(Player p) {
+        Quests qs = plugin.quests();
+        Menu m = menu(6, "&6&lQuests");
+        int slot = 0;
+        for (Quests.Quest q : qs.quests().values()) {
+            if (!q.actief) continue;
+            if (slot >= 45) break;
+            zet(m, slot++, qs.knop(p, q), c -> { klik(p); qs.klik(p, q, c); if (p.isOnline()) quests(p); });
+        }
+        if (slot == 0) zet(m, 22, knop(Material.PAPER, "&7Er zijn nu geen quests.", "&7Kom later terug!"), null);
+        zet(m, 45, saldoKnop(p), null);
+        zet(m, 49, knop(Material.BOOK, "&e&lZo werkt het",
+                "&7Klik op een quest om hem te starten.",
+                "&7Je kunt " + qs.max() + " quests tegelijk doen (nu: " + qs.bezigAantal(p.getUniqueId()) + ").",
+                "&7Ben je klaar, dan krijg je de beloning meteen.",
+                "&7Inlever-quests: klik als je de spullen bij je hebt.",
+                "&7Telt alleen in survival, niet in creative."), null);
+        zet(m, 53, knop(Material.SUNFLOWER, plugin.kleur() + "&l" + plugin.muntNaam(), "&eKlik om het muntenmenu te openen"), c -> { klik(p); hoofdmenu(p); });
+        vul(m.inv, Material.GRAY_STAINED_GLASS_PANE);
+        p.openInventory(m.inv);
     }
 
     // -------------------------------------------------------------- toplijst
