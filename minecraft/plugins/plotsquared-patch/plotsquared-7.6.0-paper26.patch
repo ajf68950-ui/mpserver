@@ -1,0 +1,131 @@
+diff --git a/Bukkit/src/main/java/com/plotsquared/bukkit/BukkitPlatform.java b/Bukkit/src/main/java/com/plotsquared/bukkit/BukkitPlatform.java
+index e1b27a8..8a15e67 100644
+--- a/Bukkit/src/main/java/com/plotsquared/bukkit/BukkitPlatform.java
++++ b/Bukkit/src/main/java/com/plotsquared/bukkit/BukkitPlatform.java
+@@ -1270,7 +1270,7 @@ public final class BukkitPlatform extends JavaPlugin implements Listener, PlotPl
+ 
+     @Override
+     public @NonNull Audience consoleAudience() {
+-        return BukkitUtil.BUKKIT_AUDIENCES.console();
++        return com.plotsquared.bukkit.util.NativeAudience.of(org.bukkit.Bukkit.getConsoleSender(), BukkitUtil.BUKKIT_AUDIENCES.console());
+     }
+ 
+     @Override
+diff --git a/Bukkit/src/main/java/com/plotsquared/bukkit/player/BukkitPlayer.java b/Bukkit/src/main/java/com/plotsquared/bukkit/player/BukkitPlayer.java
+index 2e4986c..0006b88 100644
+--- a/Bukkit/src/main/java/com/plotsquared/bukkit/player/BukkitPlayer.java
++++ b/Bukkit/src/main/java/com/plotsquared/bukkit/player/BukkitPlayer.java
+@@ -351,7 +351,7 @@ public class BukkitPlayer extends PlotPlayer<Player> {
+ 
+     @Override
+     public @NonNull Audience getAudience() {
+-        return BukkitUtil.BUKKIT_AUDIENCES.player(this.player);
++        return com.plotsquared.bukkit.util.NativeAudience.of(this.player, BukkitUtil.BUKKIT_AUDIENCES.player(this.player));
+     }
+ 
+     @Override
+diff --git a/Bukkit/src/main/java/com/plotsquared/bukkit/util/NativeAudience.java b/Bukkit/src/main/java/com/plotsquared/bukkit/util/NativeAudience.java
+new file mode 100644
+index 0000000..3afe1d9
+--- /dev/null
++++ b/Bukkit/src/main/java/com/plotsquared/bukkit/util/NativeAudience.java
+@@ -0,0 +1,99 @@
++package com.plotsquared.bukkit.util;
++
++import net.kyori.adventure.audience.Audience;
++import net.kyori.adventure.text.Component;
++import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
++import net.kyori.adventure.title.Title;
++import org.bukkit.command.CommandSender;
++import org.checkerframework.checker.nullness.qual.NonNull;
++
++import java.lang.reflect.Method;
++import java.time.Duration;
++
++/**
++ * Sends PlotSquared's (relocated) components through the server's own Adventure API.
++ * adventure-platform-bukkit does not deliver messages or titles on Paper 26.x, so on
++ * servers with native Adventure every component is converted via JSON and handed to Paper.
++ * Class names are assembled at runtime so the shadow relocation leaves them alone.
++ */
++public final class NativeAudience implements Audience {
++
++    private static final String KYORI = new String(new char[]{'n', 'e', 't'}) + ".kyori.adventure";
++    private static boolean ready;
++    private static Method nGson, nDeserialize, nSendMessage, nSendActionBar, nShowTitle, nClearTitle, nTitle, nTimes;
++
++    static {
++        try {
++            Class<?> serializer = Class.forName(KYORI + ".text.serializer.gson.GsonComponentSerializer");
++            Class<?> component = Class.forName(KYORI + ".text.Component");
++            Class<?> audience = Class.forName(KYORI + ".audience.Audience");
++            Class<?> title = Class.forName(KYORI + ".title.Title");
++            Class<?> times = Class.forName(KYORI + ".title.Title$Times");
++            nGson = serializer.getMethod("gson");
++            nDeserialize = serializer.getMethod("deserialize", Object.class);
++            nSendMessage = audience.getMethod("sendMessage", component);
++            nSendActionBar = audience.getMethod("sendActionBar", component);
++            nShowTitle = audience.getMethod("showTitle", title);
++            nClearTitle = audience.getMethod("clearTitle");
++            nTitle = title.getMethod("title", component, component, times);
++            nTimes = times.getMethod("times", Duration.class, Duration.class, Duration.class);
++            ready = audience.isAssignableFrom(CommandSender.class);
++        } catch (Throwable ignored) {
++            ready = false;
++        }
++    }
++
++    private final CommandSender target;
++
++    private NativeAudience(final @NonNull CommandSender target) {
++        this.target = target;
++    }
++
++    /** The native bridge when the server supports it, otherwise the given fallback. */
++    public static @NonNull Audience of(final @NonNull CommandSender sender, final @NonNull Audience fallback) {
++        return ready ? new NativeAudience(sender) : fallback;
++    }
++
++    private static Object toNative(final Component component) throws ReflectiveOperationException {
++        final String json = GsonComponentSerializer.gson().serialize(component == null ? Component.empty() : component);
++        return nDeserialize.invoke(nGson.invoke(null), json);
++    }
++
++    @Override
++    public void sendMessage(final @NonNull Component message) {
++        try {
++            nSendMessage.invoke(this.target, toNative(message));
++        } catch (ReflectiveOperationException e) {
++            this.target.sendMessage(net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().serialize(message));
++        }
++    }
++
++    @Override
++    public void sendActionBar(final @NonNull Component message) {
++        try {
++            nSendActionBar.invoke(this.target, toNative(message));
++        } catch (ReflectiveOperationException ignored) {
++        }
++    }
++
++    @Override
++    public void showTitle(final @NonNull Title title) {
++        try {
++            final Title.Times t = title.times();
++            final Object times = t == null
++                    ? nTimes.invoke(null, Duration.ofMillis(500), Duration.ofMillis(3500), Duration.ofMillis(1000))
++                    : nTimes.invoke(null, t.fadeIn(), t.stay(), t.fadeOut());
++            nShowTitle.invoke(this.target, nTitle.invoke(null, toNative(title.title()), toNative(title.subtitle()), times));
++        } catch (ReflectiveOperationException ignored) {
++        }
++    }
++
++    @Override
++    public void clearTitle() {
++        try {
++            nClearTitle.invoke(this.target);
++        } catch (ReflectiveOperationException ignored) {
++        }
++    }
++
++}
