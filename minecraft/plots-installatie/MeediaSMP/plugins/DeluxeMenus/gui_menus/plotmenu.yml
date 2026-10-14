@@ -1,0 +1,165 @@
+menu_title: '&6&lDe Stad &8- plots'
+size: 45
+open_command:
+  - stad
+  - plotmenu
+items:
+  vulling:
+    material: GRAY_STAINED_GLASS_PANE
+    slots: [0, 1, 2, 3, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 37, 38, 39, 41, 42, 43, 44]
+    display_name: ' '
+  uitleg:
+    material: BOOK
+    slot: 4
+    item_flags: [HIDE_ATTRIBUTES]
+    display_name: '&6&lDe Stad'
+    lore:
+      - '&7Koop een plot in de stad en bouw'
+      - '&7wat je wilt. Hier speel je in creative.'
+      - ''
+      - '&7Een plot is 32 x 32 blokken.'
+      - '&7Je spullen uit survival blijven daar.'
+  naar_stad:
+    material: COMPASS
+    slot: 11
+    item_flags: [HIDE_ATTRIBUTES]
+    display_name: '&b&lNaar de stad'
+    lore:
+      - '&7Ga naar de plotwereld.'
+      - ''
+      - '&eKlik om te gaan'
+    left_click_commands:
+      - '[close]'
+      - '[console] mvtp %player_name% plots'
+  kopen:
+    material: EMERALD
+    slot: 13
+    item_flags: [HIDE_ATTRIBUTES]
+    display_name: '&a&lPlot kopen'
+    lore:
+      - '&7Je krijgt het eerstvolgende vrije plot'
+      - '&7en wordt er meteen naartoe gebracht.'
+      - ''
+      - '&7Prijs: &a$25.000'
+      - ''
+      - '&eKlik om te kopen'
+    left_click_commands:
+      - '[close]'
+      - '[console] mvtp %player_name% plots'
+      - '[player] plot auto <delay=20>'
+  hier_kopen:
+    material: GRASS_BLOCK
+    slot: 15
+    item_flags: [HIDE_ATTRIBUTES]
+    display_name: '&a&lDit plot kopen'
+    lore:
+      - '&7Sta je in de stad op een leeg plot'
+      - '&7dat je mooi vindt? Koop precies dat plot.'
+      - ''
+      - '&7Prijs: &a$25.000'
+      - ''
+      - '&eKlik om te kopen'
+    left_click_commands:
+      - '[close]'
+      - '[player] plot claim'
+  thuis:
+    material: OAK_DOOR
+    slot: 19
+    item_flags: [HIDE_ATTRIBUTES]
+    display_name: '&e&lNaar je plot'
+    lore:
+      - '&7Ga naar je eigen plot.'
+      - '&7Meerdere plots? Typ &f/plot home 2&7, enz.'
+      - ''
+      - '&eKlik om te gaan'
+    left_click_commands:
+      - '[close]'
+      - '[player] plot home'
+  info:
+    material: SPYGLASS
+    slot: 21
+    item_flags: [HIDE_ATTRIBUTES]
+    display_name: '&e&lPlot info'
+    lore:
+      - '&7Van wie is het plot waar je staat'
+      - '&7en wie mogen er bouwen?'
+      - ''
+      - '&eKlik voor info'
+    left_click_commands:
+      - '[close]'
+      - '[player] plot info'
+  bekijken:
+    material: MAP
+    slot: 23
+    item_flags: [HIDE_ATTRIBUTES]
+    display_name: '&e&lPlots bekijken'
+    lore:
+      - '&7Lijst van alle plots in de stad.'
+      - '&7Bezoeken: &f/plot visit <naam>'
+      - ''
+      - '&eKlik voor de lijst'
+    left_click_commands:
+      - '[close]'
+      - '[player] plot list all'
+  vrienden:
+    material: PLAYER_HEAD
+    slot: 25
+    item_flags: [HIDE_ATTRIBUTES]
+    display_name: '&e&lSamen bouwen'
+    lore:
+      - '&7Laat een vriend meebouwen op je plot.'
+      - '&7Ga op je plot staan en typ:'
+      - '&f/plot trust <naam> &7- mag altijd bouwen'
+      - '&f/plot add <naam> &7- mag bouwen als jij online bent'
+      - '&f/plot remove <naam> &7- weer weghalen'
+      - '&f/plot deny <naam> &7- mag je plot niet meer in'
+    left_click_commands:
+      - '[close]'
+      - '[message] &6[Stad] &7Ga op je plot staan en typ &f/plot trust <naam>&7 (altijd) of &f/plot add <naam>&7 (alleen als jij online bent).'
+  samenvoegen:
+    material: ANVIL
+    slot: 29
+    item_flags: [HIDE_ATTRIBUTES]
+    display_name: '&d&lPlots samenvoegen'
+    lore:
+      - '&7Heb je twee plots naast elkaar?'
+      - '&7Kijk naar het andere plot en klik:'
+      - '&7dan worden ze samen een groot plot.'
+      - ''
+      - '&7Prijs: &a$25.000'
+    left_click_commands:
+      - '[close]'
+      - '[player] plot merge'
+  leegmaken:
+    material: BRUSH
+    slot: 31
+    item_flags: [HIDE_ATTRIBUTES]
+    display_name: '&c&lPlot leegmaken'
+    lore:
+      - '&7Maakt het plot waar je staat weer leeg.'
+      - '&7Je houdt het plot.'
+      - ''
+      - '&cDaarna bevestigen met &f/plot confirm'
+    left_click_commands:
+      - '[close]'
+      - '[player] plot clear'
+  verkopen:
+    material: GOLD_INGOT
+    slot: 33
+    item_flags: [HIDE_ATTRIBUTES]
+    display_name: '&c&lPlot terugverkopen'
+    lore:
+      - '&7Geef het plot waar je staat terug aan'
+      - '&7de stad. Alles erop verdwijnt.'
+      - ''
+      - '&7Je krijgt terug: &a$10.000'
+      - '&cDaarna bevestigen met &f/plot confirm'
+    left_click_commands:
+      - '[close]'
+      - '[player] plot delete'
+  sluiten:
+    material: BARRIER
+    slot: 40
+    display_name: '&cSluiten'
+    left_click_commands:
+      - '[close]'
