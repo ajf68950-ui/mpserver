@@ -111,6 +111,12 @@ final class WebApi {
                 result = sync(this::opties);
             } else if (path.equals("/admin/geef") && method.equals("POST")) {
                 result = sync(() -> adminGeef(b));
+            } else if (path.equals("/admin/luckperms") && method.equals("POST")) {
+                result = sync(() -> luckPerms(b));
+            } else if (path.equals("/admin/rang") && method.equals("POST")) {
+                result = adminRang(b);
+            } else if (path.equals("/admin/rangen") && method.equals("POST")) {
+                result = rangenInstellen(b);
             } else if (parts.length >= 2 && parts[0].equals("player")) {
                 UUID uuid;
                 try { uuid = UUID.fromString(parts[1]); } catch (Exception e) { send(ex, 400, error("Ongeldige speler.")); return; }
@@ -119,6 +125,7 @@ final class WebApi {
                     case "" -> sync(() -> state(uuid, b));
                     case "buy" -> method.equals("POST") ? sync(() -> buy(uuid, b)) : null;
                     case "lootbox" -> method.equals("POST") ? sync(() -> lootbox(uuid, b)) : null;
+                    case "rang" -> method.equals("POST") ? rangKopen(uuid, b) : rangInfo(uuid, b);
                     default -> null;
                 };
                 if (result == null) { send(ex, 404, error("Deze functie kent Muntly nog niet. Herstart MeediaSMP zodat de nieuwste Muntly geladen wordt.")); return; }
@@ -427,6 +434,189 @@ final class WebApi {
             plugin.getLogger().log(Level.WARNING, "Kon de kluis niet controleren", e);
             return "Er ging iets mis met de kluis.";
         }
+    }
+
+    /**
+     * LuckPerms-editor voor het beheer op de website. LuckPerms voert commando's op de achtergrond uit,
+     * daardoor komt de uitvoer niet terug via RCON. Hier draait het commando als de echte console,
+     * zodat de editor-link en de meldingen in logs/latest.log komen, waar de website ze leest.
+     * Alleen deze drie vaste commando's; de code wordt streng gecontroleerd.
+     */
+    private JsonObject luckPerms(JsonObject b) {
+        Plugin lp = Bukkit.getPluginManager().getPlugin("LuckPerms");
+        if (lp == null || !lp.isEnabled()) return error("LuckPerms staat niet aan op de server.");
+        String actie = str(b, "actie");
+        String code = str(b, "code");
+        String cmd;
+        switch (actie) {
+            case "editor" -> cmd = "lp editor";
+            case "trust" -> {
+                if (!code.matches("[A-Za-z0-9-]{3,40}")) return error("Ongeldige sessiecode.");
+                cmd = "lp trusteditor " + code;
+            }
+            case "apply" -> {
+                if (!code.matches("[A-Za-z0-9]{3,40}")) return error("Ongeldige code. Plak alleen de code achter /lp applyedits.");
+                cmd = "lp applyedits " + code;
+            }
+            default -> { return error("Onbekende actie."); }
+        }
+        plugin.getLogger().info("Website-beheer: " + cmd);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+        JsonObject o = new JsonObject();
+        o.addProperty("ok", true);
+        o.addProperty("commando", cmd);
+        return o;
+    }
+
+    // ---------------------------------------------------------------- rangen
+    private Rangen rangen;
+
+    /** null als LuckPerms er niet is; de klasse Rangen wordt dan nooit geladen. */
+    private Rangen rangen() {
+        if (!Bukkit.getPluginManager().isPluginEnabled("LuckPerms")) return null;
+        if (rangen == null) rangen = new Rangen(plugin);
+        return rangen;
+    }
+
+    private static List<String> ladder(JsonObject b) {
+        java.util.List<String> l = new java.util.ArrayList<>();
+        if (b.has("ladder") && b.get("ladder").isJsonArray()) {
+            for (com.google.gson.JsonElement e : b.getAsJsonArray("ladder")) {
+                String g = e.getAsString().trim();
+                if (Rangen.GROEP.matcher(g).matches() && !g.equals("default") && !l.contains(g)) l.add(g);
+            }
+        }
+        return l;
+    }
+
+    private JsonObject rangState(UUID uuid, List<String> groepen) throws Exception {
+        JsonObject o = sync(() -> {
+            JsonObject s = new JsonObject();
+            Saldi.Speler sp = plugin.saldi().get(uuid, Bukkit.getOfflinePlayer(uuid).getName());
+            s.addProperty("saldo", sp.saldo);
+            Economy eco = plugin.economy();
+            if (eco != null) {
+                try { s.addProperty("geld", eco.getBalance(Bukkit.getOfflinePlayer(uuid))); } catch (Exception ignored) { }
+            }
+            s.add("munt", munt());
+            return s;
+        });
+        JsonArray g = new JsonArray();
+        groepen.forEach(g::add);
+        o.add("groepen", g);
+        return o;
+    }
+
+    private JsonObject rangInfo(UUID uuid, JsonObject b) throws Exception {
+        Rangen r = rangen();
+        if (r == null) return error("LuckPerms staat niet aan op de server.");
+        List<String> groepen;
+        try { groepen = r.groepen(uuid); } catch (TimeoutException e) { return error("LuckPerms reageert niet. Probeer het zo nog eens."); }
+        return rangState(uuid, groepen);
+    }
+
+    /**
+     * Een rang kopen via de website. De website stuurt de ladder (laag naar hoog), het doel, de rang
+     * die de speler volgens de pagina nu heeft, de prijs en de munt (geld of munten).
+     */
+    private JsonObject rangKopen(UUID uuid, JsonObject b) throws Exception {
+        Rangen r = rangen();
+        if (r == null) return error("LuckPerms staat niet aan op de server.");
+        List<String> ladder = ladder(b);
+        String doel = str(b, "doel"), vanaf = str(b, "vanaf"), munt = str(b, "munt"), naam = str(b, "naam");
+        int doelIdx = ladder.indexOf(doel);
+        if (doelIdx < 0) return error("Deze rang bestaat niet (meer). Ververs de pagina.");
+        if (!munt.equals("geld") && !munt.equals("munten")) return error("Onbekende betaalmanier.");
+        double prijs;
+        try { prijs = b.get("prijs").getAsDouble(); } catch (Exception e) { return error("Ongeldige prijs."); }
+        if (!(prijs >= 0) || Double.isInfinite(prijs)) return error("Ongeldige prijs.");
+        final double bedrag = munt.equals("munten") ? Math.ceil(prijs) : Math.round(prijs * 100.0) / 100.0;
+        if (!r.bestaat(doel)) return error("Deze rang staat nog niet op de server. Vraag een beheerder om de rangen toe te passen.");
+        List<String> groepen = r.groepen(uuid);
+        int nu = Rangen.hoogste(groepen, ladder);
+        if (nu != ladder.indexOf(vanaf)) return error("Je rang is intussen veranderd. Ververs de pagina.");
+        if (doelIdx <= nu) return error("Je hebt deze rang al, of een hogere.");
+        final String weergave = naam.isEmpty() ? doel : naam;
+        // betalen op de main thread
+        JsonObject betaald = sync(() -> {
+            Saldi.Speler sp = speler(uuid, b);
+            if (munt.equals("munten")) {
+                long n = (long) bedrag;
+                if (!plugin.saldi().take(sp, n, "rang: " + doel)) return error("Je hebt niet genoeg " + plugin.muntNaam() + ". Je hebt er " + Muntly.fmt(sp.saldo) + ", dit kost " + Muntly.fmt(n) + ".");
+            } else {
+                Economy eco = plugin.economy();
+                if (eco == null) return error("Er is geen economy (Vault) gevonden.");
+                OfflinePlayer op = Bukkit.getOfflinePlayer(uuid);
+                if (!eco.hasAccount(op)) eco.createPlayerAccount(op);
+                double geld = eco.getBalance(op);
+                if (geld < bedrag) return error("Je hebt niet genoeg geld. Je hebt $" + Muntly.fmt((long) Math.floor(geld)) + ", dit kost $" + Muntly.fmt(Math.round(bedrag)) + ".");
+                if (bedrag > 0 && !eco.withdrawPlayer(op, bedrag).transactionSuccess()) return error("Betalen is niet gelukt.");
+            }
+            return new JsonObject();
+        });
+        if (betaald.has("error")) return betaald;
+        try {
+            r.zet(uuid, doel, ladder);
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.WARNING, "Rang geven mislukt, betaling teruggegeven", e);
+            sync(() -> {
+                Saldi.Speler sp = speler(uuid, b);
+                if (munt.equals("munten")) plugin.saldi().add(sp, (long) bedrag, "rang terug (mislukt): " + doel);
+                else { Economy eco = plugin.economy(); if (eco != null) eco.depositPlayer(Bukkit.getOfflinePlayer(uuid), bedrag); }
+                return new JsonObject();
+            });
+            return error("De rang kon niet gegeven worden. Je hebt je " + (munt.equals("munten") ? plugin.muntNaam() : "geld") + " terug.");
+        }
+        sync(() -> {
+            Saldi.Speler sp = speler(uuid, b);
+            String prijsTekst = munt.equals("munten") ? plugin.munten((long) bedrag) : "$" + Muntly.fmt(Math.round(bedrag));
+            plugin.getLogger().info(sp.naam + " kocht via de website de rang " + doel + " voor " + prijsTekst);
+            notifyRang(uuid, "&aJe hebt nu de rang &f" + weergave + "&a. Bedankt!");
+            Bukkit.broadcast(Winkel.tekst("&6[Rang] &e" + sp.naam + " &7heeft nu de rang &f" + weergave + "&7!"));
+            return new JsonObject();
+        });
+        JsonObject o = rangState(uuid, r.groepen(uuid));
+        o.addProperty("gekocht", doel);
+        return o;
+    }
+
+    /** Beheer: een speler een rang geven ("" = geen rang meer). */
+    private JsonObject adminRang(JsonObject b) throws Exception {
+        Rangen r = rangen();
+        if (r == null) return error("LuckPerms staat niet aan op de server.");
+        List<String> ladder = ladder(b);
+        String doel = str(b, "doel");
+        if (!doel.isEmpty() && !ladder.contains(doel)) return error("Onbekende rang.");
+        if (!doel.isEmpty() && !r.bestaat(doel)) return error("Deze rang staat nog niet op de server. Klik eerst op Toepassen op de server.");
+        String naam = str(b, "speler");
+        JsonObject wie = sync(() -> {
+            Saldi.Speler sp = plugin.zoek(naam);
+            if (sp == null) return error("Speler " + naam + " is niet bekend op deze server.");
+            JsonObject o = new JsonObject();
+            o.addProperty("uuid", sp.uuid.toString());
+            o.addProperty("naam", sp.naam);
+            return o;
+        });
+        if (wie.has("error")) return wie;
+        UUID uuid = UUID.fromString(wie.get("uuid").getAsString());
+        r.zet(uuid, doel.isEmpty() ? null : doel, ladder);
+        String sn = wie.get("naam").getAsString();
+        plugin.getLogger().info("Beheer (website): rang van " + sn + " gezet op " + (doel.isEmpty() ? "(geen)" : doel));
+        sync(() -> { notifyRang(uuid, doel.isEmpty() ? "&7Je rang is weggehaald door een beheerder." : "&aJe hebt de rang &f" + str(b, "naam") + "&a gekregen van een beheerder."); return new JsonObject(); });
+        JsonObject o = rangState(uuid, r.groepen(uuid));
+        o.addProperty("naam", sn);
+        return o;
+    }
+
+    private JsonObject rangenInstellen(JsonObject b) throws Exception {
+        Rangen r = rangen();
+        if (r == null) return error("LuckPerms staat niet aan op de server.");
+        return r.instellen(b);
+    }
+
+    private void notifyRang(UUID uuid, String text) {
+        Player p = Bukkit.getPlayer(uuid);
+        if (p != null) p.sendMessage(Winkel.tekst("&6[Rang] &7" + text));
     }
 
     private void notify(UUID uuid, String text) {

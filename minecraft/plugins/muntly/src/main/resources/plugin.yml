@@ -2,8 +2,8 @@ name: Muntly
 version: '${project.version}'
 main: muntly.Muntly
 api-version: '26.2'
-description: Eigen munt (Munten) met speeltijd- en dagbeloning, muntenwinkel, lootboxen en quests, ook te gebruiken via de website.
-softdepend: [Vault, PlaceholderAPI, Vaulty]
+description: Eigen munt (Munten) met speeltijd- en dagbeloning, muntenwinkel, lootboxen, quests en rangen, ook te gebruiken via de website.
+softdepend: [Vault, PlaceholderAPI, Vaulty, LuckPerms]
 commands:
   munten:
     description: Je Munten, de muntenwinkel en de lootboxen.
