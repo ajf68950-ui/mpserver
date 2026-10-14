@@ -19,6 +19,7 @@ Getest op de 26.2-testserver op 14-10-2026. **Server eerst uit.** Paden zijn rel
    - `mv create plots normal --generator PlotSquared` (pas NA stap 3 en 4)
    - `mv modify plots set gamemode creative` (indien nodig)
    - `lp group default permission set plots.permpack.basic true` en `lp group default permission set plots.plot.2 true`
+   - `lp group default permission set essentials.build true world=plots` — EssentialsX AntiBuild staat aan (`build: true`, `use: true`), dus zonder dit recht mogen spelers die geen OP zijn niets plaatsen of gebruiken in hun plot ("You are not permitted to use …"). Met `world=plots` geldt het alleen in de plotwereld; wegen en plots van anderen beschermt PlotSquared zelf. Testen met een account dat **geen** OP is.
    - NPC: `/npc create &6&lStad`, `/npc command add -p stad`, `/citizens save`
 
 Prijzen (in worlds.yml): kopen $25.000, samenvoegen $25.000, terugverkopen geeft $10.000.
