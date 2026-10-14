@@ -1,11 +1,11 @@
 {
-  "bijgewerkt": "2026-10-13",
+  "bijgewerkt": "2026-10-14",
   "plugins": [
     {
       "naam": "Vaulty",
-      "versie": "1.1.0",
-      "bestand": "Vaulty-1.1.0.jar",
-      "sha1": "b9b9055a1de7d7b6af1eeb3a208664d68b113711",
+      "versie": "1.2.0",
+      "bestand": "Vaulty-1.2.0.jar",
+      "sha1": "796e0d43b683c18ad6bae65841fb5430e001db71",
       "minecraft": "26.2"
     },
     {
@@ -27,6 +27,13 @@
       "versie": "1.0.0",
       "bestand": "Toolwise-1.0.0.jar",
       "sha1": "2ea4d76a0302ca1dcbd766006af235166336ce38",
+      "minecraft": "26.2"
+    },
+    {
+      "naam": "Muntly",
+      "versie": "1.0.0",
+      "bestand": "Muntly-1.0.0.jar",
+      "sha1": "b2824977baf8175115da512a57caa453a2436f65",
       "minecraft": "26.2"
     }
   ]

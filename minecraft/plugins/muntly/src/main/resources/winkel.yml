@@ -1,0 +1,262 @@
+# Muntly - muntenwinkel en lootboxen.
+# Na het aanpassen: /munten herladen.
+#
+# Een item:
+#   prijs: wat het kost in Munten (weglaten of alleen-lootbox: true = niet te koop, alleen uit een lootbox)
+#   categorie: wapens, gereedschap, armor of overig (bepaalt de volgorde in de winkel)
+#   materiaal: Minecraft-naam, bijv. netherite_sword
+#   naam / lore: met kleurcodes (&6 = goud, &l = vet)
+#   enchants: naam: niveau (mag hoger dan normaal, bijv. sharpness: 6)
+#   trim: { materiaal: gold, patroon: silence }   (alleen armor)
+#   kleur: '#RRGGBB'                              (alleen leren armor)
+#   onbreekbaar: true
+#   zeldzaamheid: gewoon, zeldzaam, episch of legendarisch (kleur van de naam als er geen kleur in staat)
+
+items:
+  # ------------------------------------------------------------ wapens
+  stormzwaard:
+    prijs: 400
+    categorie: wapens
+    materiaal: netherite_sword
+    naam: '&b&lStormzwaard'
+    lore: ['&7Snijdt door elke storm heen.']
+    enchants: {sharpness: 6, sweeping_edge: 4, looting: 4, fire_aspect: 2, unbreaking: 4, mending: 1}
+    zeldzaamheid: episch
+  vlammenbijl:
+    prijs: 350
+    categorie: wapens
+    materiaal: netherite_axe
+    naam: '&c&lVlammenbijl'
+    lore: ['&7Heet van de smidse.']
+    enchants: {sharpness: 6, fire_aspect: 2, efficiency: 5, unbreaking: 4, mending: 1}
+    zeldzaamheid: episch
+  valkenboog:
+    prijs: 300
+    categorie: wapens
+    materiaal: bow
+    naam: '&a&lValkenboog'
+    lore: ['&7Mist nooit zijn doel.']
+    enchants: {power: 6, punch: 2, flame: 1, infinity: 1, unbreaking: 4}
+    zeldzaamheid: zeldzaam
+  donderdrietand:
+    prijs: 350
+    categorie: wapens
+    materiaal: trident
+    naam: '&9&lDonderdrietand'
+    lore: ['&7Roept de bliksem op.']
+    enchants: {impaling: 6, loyalty: 3, channeling: 1, unbreaking: 4, mending: 1}
+    zeldzaamheid: episch
+  aardschokhamer:
+    prijs: 500
+    categorie: wapens
+    materiaal: mace
+    naam: '&6&lAardschokhamer'
+    lore: ['&7Laat de grond trillen.']
+    enchants: {density: 6, wind_burst: 2, unbreaking: 4, mending: 1}
+    zeldzaamheid: episch
+
+  # ------------------------------------------------------- gereedschap
+  diepgraver:
+    prijs: 450
+    categorie: gereedschap
+    materiaal: netherite_pickaxe
+    naam: '&b&lDiepgraver'
+    lore: ['&7Vindt altijd wat extra.']
+    enchants: {efficiency: 6, fortune: 4, unbreaking: 4, mending: 1}
+    zeldzaamheid: episch
+  zijden-diepgraver:
+    prijs: 350
+    categorie: gereedschap
+    materiaal: netherite_pickaxe
+    naam: '&f&lZijden Diepgraver'
+    lore: ['&7Haalt alles heel uit de grond.']
+    enchants: {efficiency: 6, silk_touch: 1, unbreaking: 4, mending: 1}
+    zeldzaamheid: zeldzaam
+  houthakkersbijl:
+    prijs: 250
+    categorie: gereedschap
+    materiaal: netherite_axe
+    naam: '&2&lHouthakkersbijl'
+    lore: ['&7Een bos is zo gekapt.']
+    enchants: {efficiency: 6, unbreaking: 4, mending: 1}
+    zeldzaamheid: zeldzaam
+  tuinschep:
+    prijs: 200
+    categorie: gereedschap
+    materiaal: netherite_shovel
+    naam: '&e&lTuinschep'
+    lore: ['&7Graaft sneller dan een mol.']
+    enchants: {efficiency: 6, unbreaking: 4, mending: 1}
+    zeldzaamheid: zeldzaam
+  visserslijn:
+    prijs: 150
+    categorie: gereedschap
+    materiaal: fishing_rod
+    naam: '&3&lVisserslijn'
+    lore: ['&7De vissen bijten vanzelf.']
+    enchants: {luck_of_the_sea: 4, lure: 3, unbreaking: 4, mending: 1}
+    zeldzaamheid: zeldzaam
+
+  # ------------------------------------------------------------- armor
+  drakenhelm:
+    prijs: 300
+    categorie: armor
+    materiaal: netherite_helmet
+    naam: '&5&lDrakenhelm'
+    lore: ['&7Deel van de Drakenschub-set.']
+    enchants: {protection: 5, respiration: 3, aqua_affinity: 1, unbreaking: 4, mending: 1}
+    trim: {materiaal: gold, patroon: silence}
+    zeldzaamheid: episch
+  drakenborst:
+    prijs: 400
+    categorie: armor
+    materiaal: netherite_chestplate
+    naam: '&5&lDrakenborst'
+    lore: ['&7Deel van de Drakenschub-set.']
+    enchants: {protection: 5, thorns: 3, unbreaking: 4, mending: 1}
+    trim: {materiaal: gold, patroon: silence}
+    zeldzaamheid: episch
+  drakenbeen:
+    prijs: 350
+    categorie: armor
+    materiaal: netherite_leggings
+    naam: '&5&lDrakenbeen'
+    lore: ['&7Deel van de Drakenschub-set.']
+    enchants: {protection: 5, swift_sneak: 3, unbreaking: 4, mending: 1}
+    trim: {materiaal: gold, patroon: silence}
+    zeldzaamheid: episch
+  drakenpoot:
+    prijs: 300
+    categorie: armor
+    materiaal: netherite_boots
+    naam: '&5&lDrakenpoot'
+    lore: ['&7Deel van de Drakenschub-set.']
+    enchants: {protection: 5, feather_falling: 5, depth_strider: 3, soul_speed: 3, unbreaking: 4, mending: 1}
+    trim: {materiaal: gold, patroon: silence}
+    zeldzaamheid: episch
+  wachtershelm:
+    prijs: 120
+    categorie: armor
+    materiaal: diamond_helmet
+    naam: '&b&lWachtershelm'
+    lore: ['&7Deel van de Wachters-set.']
+    enchants: {protection: 5, unbreaking: 3, mending: 1}
+    trim: {materiaal: amethyst, patroon: ward}
+    zeldzaamheid: zeldzaam
+  wachtersborst:
+    prijs: 160
+    categorie: armor
+    materiaal: diamond_chestplate
+    naam: '&b&lWachtersborst'
+    lore: ['&7Deel van de Wachters-set.']
+    enchants: {protection: 5, unbreaking: 3, mending: 1}
+    trim: {materiaal: amethyst, patroon: ward}
+    zeldzaamheid: zeldzaam
+  wachtersbeen:
+    prijs: 140
+    categorie: armor
+    materiaal: diamond_leggings
+    naam: '&b&lWachtersbeen'
+    lore: ['&7Deel van de Wachters-set.']
+    enchants: {protection: 5, unbreaking: 3, mending: 1}
+    trim: {materiaal: amethyst, patroon: ward}
+    zeldzaamheid: zeldzaam
+  wachterspoot:
+    prijs: 120
+    categorie: armor
+    materiaal: diamond_boots
+    naam: '&b&lWachterspoot'
+    lore: ['&7Deel van de Wachters-set.']
+    enchants: {protection: 5, feather_falling: 4, unbreaking: 3, mending: 1}
+    trim: {materiaal: amethyst, patroon: ward}
+    zeldzaamheid: zeldzaam
+
+  # ------------------------------------------------------------ overig
+  hemelvleugels:
+    prijs: 250
+    categorie: overig
+    materiaal: elytra
+    naam: '&d&lHemelvleugels'
+    lore: ['&7Gaan veel langer mee.']
+    enchants: {unbreaking: 5, mending: 1}
+    zeldzaamheid: episch
+
+  # ------------------------------------------- alleen uit een lootbox
+  koningskroon:
+    alleen-lootbox: true
+    categorie: armor
+    materiaal: netherite_helmet
+    naam: '&6&lKoningskroon'
+    lore: ['&7Alleen te vinden in de Drakenkist.']
+    enchants: {protection: 6, respiration: 3, aqua_affinity: 1, unbreaking: 5, mending: 1}
+    trim: {materiaal: gold, patroon: eye}
+    zeldzaamheid: legendarisch
+  eeuwig-stormzwaard:
+    alleen-lootbox: true
+    categorie: wapens
+    materiaal: netherite_sword
+    naam: '&6&lEeuwig Stormzwaard'
+    lore: ['&7Gaat nooit kapot.', '&7Alleen te vinden in de Drakenkist.']
+    enchants: {sharpness: 7, sweeping_edge: 4, looting: 5, fire_aspect: 2}
+    onbreekbaar: true
+    zeldzaamheid: legendarisch
+  oogstzeis:
+    alleen-lootbox: true
+    categorie: gereedschap
+    materiaal: netherite_hoe
+    naam: '&6&lOogstzeis'
+    lore: ['&7Oogst als nooit tevoren.', '&7Alleen te vinden in de Drakenkist.']
+    enchants: {efficiency: 7, fortune: 5, unbreaking: 5, mending: 1}
+    zeldzaamheid: legendarisch
+
+# Lootboxen. Bij elke beloning staat een kans (gewicht): hoe hoger, hoe vaker.
+# Het percentage wordt uitgerekend uit alle kansen samen. Beloningen:
+#   munten: 20                        Munten
+#   geld: 5000                        gewoon geld (via Vault)
+#   item: stormzwaard                 een item uit de lijst hierboven
+#   materiaal: diamond, aantal: 16    een gewoon Minecraft-item
+lootboxen:
+  muntenkist:
+    naam: '&e&lMuntenkist'
+    icoon: chest
+    prijs: 40
+    beschrijving: 'Voor elke dag: grondstoffen, Munten terug en soms een speciaal item.'
+    beloningen:
+      - {kans: 22, munten: 20}
+      - {kans: 7, munten: 70}
+      - {kans: 16, materiaal: diamond, aantal: 16}
+      - {kans: 10, materiaal: netherite_ingot, aantal: 2}
+      - {kans: 12, materiaal: golden_apple, aantal: 8}
+      - {kans: 12, materiaal: experience_bottle, aantal: 32}
+      - {kans: 8, geld: 25000}
+      - {kans: 3, materiaal: enchanted_golden_apple, aantal: 1}
+      - {kans: 2, item: tuinschep}
+      - {kans: 2, item: visserslijn}
+      - {kans: 1.5, item: wachtershelm}
+      - {kans: 1.5, item: wachterspoot}
+      - {kans: 1, item: wachtersbeen}
+      - {kans: 1, item: wachtersborst}
+      - {kans: 1, item: stormzwaard}
+  drakenkist:
+    naam: '&5&lDrakenkist'
+    icoon: ender_chest
+    prijs: 150
+    beschrijving: 'De kist met de beste spullen, en als enige met legendarische items.'
+    beloningen:
+      - {kans: 18, munten: 100}
+      - {kans: 4, munten: 300}
+      - {kans: 14, materiaal: netherite_ingot, aantal: 4}
+      - {kans: 10, materiaal: enchanted_golden_apple, aantal: 2}
+      - {kans: 8, materiaal: totem_of_undying, aantal: 1}
+      - {kans: 8, geld: 150000}
+      - {kans: 5, item: drakenhelm}
+      - {kans: 5, item: drakenborst}
+      - {kans: 5, item: drakenbeen}
+      - {kans: 5, item: drakenpoot}
+      - {kans: 4, item: stormzwaard}
+      - {kans: 4, item: diepgraver}
+      - {kans: 3, item: aardschokhamer}
+      - {kans: 4, item: hemelvleugels}
+      - {kans: 1, item: koningskroon}
+      - {kans: 1, item: eeuwig-stormzwaard}
+      - {kans: 1, item: oogstzeis}

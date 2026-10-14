@@ -8,6 +8,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 public final class Vaulty extends JavaPlugin {
@@ -245,6 +248,58 @@ public final class Vaulty extends JavaPlugin {
 
     static String fmt(double d) {
         return d == Math.floor(d) ? String.format(Locale.ROOT, "%,d", (long) d).replace(',', '.') : String.format(Locale.ROOT, "%.2f", d);
+    }
+
+    // ------------------------------------------------- voor andere plugins
+    private Kluis kluisVoor(UUID uuid, String nameHint) {
+        OfflinePlayer op = Bukkit.getOfflinePlayer(uuid);
+        String n = op.getName() != null ? op.getName() : nameHint;
+        return kluizen.get(uuid, n);
+    }
+
+    /** Aantal lege vakken in de kluis van een speler (voor andere plugins, zoals Muntly). Alleen op de main thread. */
+    public int freeSlots(UUID uuid, String nameHint) {
+        int n = 0;
+        for (Inventory inv : kluisVoor(uuid, nameHint).inventories()) {
+            for (ItemStack it : inv.getStorageContents()) if (it == null || it.getType().isAir()) n++;
+        }
+        return n;
+    }
+
+    /**
+     * Legt items in de kluis van een speler, alleen als alles past (voor andere plugins, zoals Muntly).
+     * Geeft null terug als het gelukt is, anders een foutmelding. Alleen op de main thread.
+     */
+    public String deliverToKluis(UUID uuid, String nameHint, List<ItemStack> items) {
+        Kluis k = kluisVoor(uuid, nameHint);
+        List<Inventory> copies = new ArrayList<>();
+        for (Inventory inv : k.inventories()) {
+            Inventory c = Bukkit.createInventory(null, Kluis.SIZE);
+            ItemStack[] cont = inv.getContents();
+            for (int i = 0; i < cont.length; i++) if (cont[i] != null) cont[i] = cont[i].clone();
+            c.setContents(cont);
+            copies.add(c);
+        }
+        for (ItemStack s : items) {
+            ItemStack rest = s.clone();
+            for (Inventory c : copies) {
+                Map<Integer, ItemStack> over = c.addItem(rest);
+                if (over.isEmpty()) { rest = null; break; }
+                rest = over.values().iterator().next();
+            }
+            if (rest != null) return "Er is niet genoeg ruimte in je kluis. Maak ruimte of koop een extra kist.";
+        }
+        for (ItemStack s : items) {
+            ItemStack rest = s.clone();
+            for (Inventory inv : k.inventories()) {
+                Map<Integer, ItemStack> over = inv.addItem(rest);
+                if (over.isEmpty()) { rest = null; break; }
+                rest = over.values().iterator().next();
+            }
+            if (rest != null) getLogger().severe("Onverwacht: geen ruimte meer in de kluis van " + k.name() + " voor " + rest);
+        }
+        kluizen.save(k);
+        return null;
     }
 
     public UUID uuidOf(String s) {

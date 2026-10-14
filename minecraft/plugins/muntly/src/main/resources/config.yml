@@ -1,0 +1,34 @@
+# Muntly - eigen munt voor de server, naast het gewone geld.
+# Na het aanpassen: /munten herladen (of de server herstarten).
+# De winkel en de lootboxen staan in winkel.yml.
+
+munt:
+  naam: Munten        # meervoud
+  enkelvoud: Munt
+  kleur: '&e'
+
+verdienen:
+  speeltijd:
+    aan: true
+    # Elke zoveel minuten actief spelen geeft zoveel Munten.
+    minuten: 30
+    munten: 2
+    # Wie zoveel minuten niets doet (niet lopen, rondkijken, typen of bouwen), telt als AFK en spaart niet.
+    afk-na-minuten: 5
+    # In deze werelden telt speeltijd niet mee (naam zoals in Multiverse).
+    niet-in-werelden: []
+  dagelijks:
+    aan: true
+    # Beloning per dag dat je achter elkaar inlogt: dag 1, dag 2, ... Na de laatste blijft de laatste gelden.
+    # Sla je een dag over, dan begint de reeks weer bij dag 1.
+    beloningen: [5, 5, 10, 10, 15, 15, 25]
+
+# Melding aan iedereen als iemand iets legendarisch uit een lootbox haalt.
+legendarisch-melden: true
+
+web:
+  # De website praat via deze poort met de plugin. Alleen bereikbaar op deze pc, niet openzetten in je router.
+  host: 127.0.0.1
+  poort: 8096
+  # Wordt automatisch aangemaakt. De website leest dit zelf uit dit bestand.
+  token: ''

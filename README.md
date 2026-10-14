@@ -11,6 +11,7 @@ Eigen plugins voor de Meedia SMP-server (Paper 26.2, Java 25).
 | **Vaulty** | `minecraft/plugins/vaulty` | Kluis voor spelers (`/kluis`), koppeling met de website en een spelersmarkt |
 | **Statusbord** | `minecraft/plugins/statusbord` | Scorebord aan de zijkant met serverinfo, wereld, geld en armor (`/statusbord`) |
 | **Pocketly** | `minecraft/plugins/pocketly` | Drops gaan automatisch in je inventaris in skyblock en OneBlock (`/pickup`) |
+| **Muntly** | `minecraft/plugins/muntly` | Eigen munt (Munten): verdienen met speeltijd en dagbeloning, muntenwinkel en lootboxen, ook via de website (`/munten`) |
 | **Toolwise** | `minecraft/plugins/toolwise` | Pakt automatisch het beste gereedschap of wapen uit je hotbar (`/toolwise`) |
 
 ### Downloaden
@@ -22,7 +23,7 @@ De kant-en-klare jars staan in [`minecraft/plugins/releases`](minecraft/plugins/
 ### Zelf bouwen
 
 ```
-cd minecraft/plugins/vaulty      (of statusbord, pocketly, toolwise)
+cd minecraft/plugins/vaulty      (of statusbord, pocketly, toolwise, muntly)
 mvn package
 ```
 
