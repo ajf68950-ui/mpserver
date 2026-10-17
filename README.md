@@ -13,6 +13,7 @@ Eigen plugins voor de Meedia SMP-server (Paper 26.2, Java 25).
 | **Pocketly** | `minecraft/plugins/pocketly` | Drops gaan automatisch in je inventaris in skyblock en OneBlock (`/pickup`) |
 | **Muntly** | `minecraft/plugins/muntly` | Eigen munt (Munten): verdienen met speeltijd en dagbeloning, muntenwinkel, lootboxen en quests, ook via de website (`/munten`, `/quests`). Vanaf 1.2.0 ook rangen (LuckPerms-groepen) kopen en geven via de website, en de LuckPerms-editor vanuit het beheer |
 | **Toolwise** | `minecraft/plugins/toolwise` | Pakt automatisch het beste gereedschap of wapen uit je hotbar (`/toolwise`) |
+| **Ordely** | `minecraft/plugins/ordely` | Regels: geld en items geven alleen via de website, niets uit creative verkopen (ook creative-blokken en -mobs leveren niets op). Gevangeniswereld met 32 cellen, opsluiten en vrijlaten (ook automatisch na waarschuwingen), logboek met reden, te gebruiken vanuit het beheer van de website (`/gevangenis`) |
 
 ### Downloaden
 
@@ -23,8 +24,15 @@ De kant-en-klare jars staan in [`minecraft/plugins/releases`](minecraft/plugins/
 ### Zelf bouwen
 
 ```
-cd minecraft/plugins/vaulty      (of statusbord, pocketly, toolwise, muntly)
+cd minecraft/plugins/vaulty      (of statusbord, pocketly, toolwise, muntly, ordely)
 mvn package
 ```
 
 Het jar-bestand komt in `target/`.
+
+### Scripts voor de server
+
+In [`minecraft/scripts`](minecraft/scripts):
+
+- `Start-alles.bat` en `Start-alles inc  s backup.bat` (in de hoofdmap van de server): servers en website afsluiten, backup, eigen plugins bijwerken, alles starten.
+- `eigen-plugins-bijwerken.ps1` (in `Resources`): zet de nieuwste jars uit `Resources\eigen-plugins` in `MPServerSMP\plugins`, met de juiste naam; een nieuwere versie in `plugins` gaat ook terug naar `Resources\eigen-plugins`.

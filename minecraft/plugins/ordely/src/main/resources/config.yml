@@ -1,0 +1,133 @@
+# Ordely: regels op de server en de gevangenis.
+# Na het aanpassen: /gevangenis herladen
+
+geven:
+  # Geld en items geven kan alleen via de website (Beheer > Economie en Admin winkel).
+  # Deze commando's zijn in het spel voor IEDEREEN geblokkeerd, ook voor OP.
+  # De serverconsole en RCON (de website) kunnen ze wel gebruiken, en de winkels
+  # (DeluxeMenus) blijven werken omdat die via de console geven.
+  # "commando subcommando" blokkeert alleen dat subcommando, bijv. "munten geef".
+  # Aliassen tellen mee: /egive, /i, /eco, /muntly geef enz. worden ook geblokkeerd.
+  geblokkeerde-commandos:
+  - give
+  - item
+  - more
+  - eco
+  - loot
+  - sudo
+  - execute
+  - invsee
+  - openinv
+  - openender
+  - searchinv
+  - data merge
+  - data modify
+  - deluxemenus execute
+  - munten geef
+  - munten pak
+  - munten zet
+  - summon item
+  # Commando's met items erin (bijv. /summon of /setblock met Items:[...]) ook blokkeren.
+  blokkeer-items-in-commandos: true
+  # /kluis <speler> (de kluis van een ander openen en vullen) blokkeren.
+  blokkeer-kluis-van-anderen: true
+
+creative:
+  # Wat je in creative (of als toeschouwer) hebt, mag niet in de economie komen.
+  aan: true
+  # In deze werelden geldt dit niet (eigen inventaris, bijv. de plotwereld).
+  vrije-werelden:
+  - plots
+  # Deze commando's werken niet in creative/toeschouwer.
+  geblokkeerde-commandos:
+  - sell
+  - opkoper
+  - shop
+  - shopsell
+  - kluis
+  - qs
+  # Verkoop-commando's tellen als overtreding (zie automatisch.creative-verkopen).
+  verkoop-commandos:
+  - sell
+  - opkoper
+  - shop
+  - shopsell
+  # Multiverse-Inventories zo instellen dat creative en survival elk een eigen inventaris hebben
+  # (ook na uitloggen in creative). Wat je in creative pakt, zit dan niet in je survival-inventaris.
+  multiverse-inventories-instellen: true
+  # Geen items weggooien, in kisten/vaten/ovens/handelaren leggen, in lijsten of op standaards zetten.
+  geen-items-wegleggen: true
+  # Blokken die in creative zijn geplaatst geven niets als iemand ze later in survival sloopt.
+  geplaatste-blokken-geven-niets: true
+  # Mobs uit spawn-eieren (in creative) of /summon laten niets vallen.
+  gespawnde-mobs-geven-niets: true
+
+gevangenis:
+  wereld: gevangenis
+  # false = straf loopt in echte tijd (ook als de speler offline is), true = alleen als hij online is.
+  alleen-online-tijd: false
+  # Iedereen in de chat laten weten dat iemand naar de gevangenis gaat (zonder reden).
+  aankondigen: true
+  # Gevangenen praten alleen met elkaar en met beheerders; ze horen de rest van de server niet.
+  chat-apart: true
+  # Gevangenen krijgen een oranje gevangenispak. Hun eigen spullen worden bewaard en komen terug bij vrijlating.
+  gevangenispak: true
+  # Alleen deze commando's werken voor gevangenen (ook als ze OP zijn).
+  toegestane-commandos:
+  - msg
+  - tell
+  - w
+  - r
+  - reply
+  - m
+  - gevangenis
+  - regels
+  - rules
+  - list
+  - help
+
+automatisch:
+  # Wie iets doet wat niet mag, krijgt eerst waarschuwingen en gaat daarna automatisch de gevangenis in.
+  # waarschuwingen: hoeveel keer je gewaarschuwd wordt (0 = meteen de gevangenis in).
+  # minuten: hoe lang de straf duurt.
+  verboden-geven:
+    aan: true
+    waarschuwingen: 1
+    minuten: 30
+  creative-verkopen:
+    aan: true
+    waarschuwingen: 1
+    minuten: 15
+  schelden:
+    aan: true
+    waarschuwingen: 2
+    minuten: 5
+    # Woorden (reguliere expressies, hele woorden). Het bericht wordt niet verstuurd.
+    woorden:
+    - kanker\w*
+    - kk
+    - tering\w*
+    - tyfus\w*
+    - klootzak\w*
+    - kut
+    - kutwijf\w*
+    - hoer(en|tje)?
+    - mongool\w*
+    - flikker\w*
+    - neger\w*
+    - kys
+  # Hoe lang een overtreding meetelt.
+  vergeet-na-uren: 24
+  # Namen of UUID's die nooit automatisch worden opgesloten (wel gewaarschuwd en geblokkeerd).
+  vrijgesteld: []
+
+# Eenmalige correcties van het geldsaldo. Elke correctie wordt maar een keer uitgevoerd
+# (bijgehouden in data.json) en komt in het logboek en in Website\logs\economie.log.
+correcties: {}
+# Voorbeeld:
+# correcties:
+#   speler-2026-01-01:
+#     speler: 00000000-0000-0000-0000-000000000000   (UUID van de speler)
+#     naam: Spelernaam
+#     geld-zetten-op: 1000
+#     reden: Waarom het saldo wordt aangepast

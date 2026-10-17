@@ -1,0 +1,18 @@
+name: Ordely
+version: '${project.version}'
+main: ordely.Ordely
+api-version: '26.2'
+description: Regels op de server (geld en items alleen via de website, niet verkopen vanuit creative) en een gevangenis met logboek.
+softdepend: [Vault, Essentials, Multiverse-Core, Multiverse-Inventories, Vaulty, Muntly]
+commands:
+  gevangenis:
+    description: De gevangenis - iemand opsluiten, vrijlaten, lijst en logboek.
+    usage: /gevangenis [info | stuur | vrij | lijst | log | tp | herbouw | herladen]
+    aliases: [gev, ordely]
+permissions:
+  ordely.gebruik:
+    description: Je eigen straf bekijken met /gevangenis info.
+    default: true
+  ordely.beheer:
+    description: Spelers opsluiten en vrijlaten, logboek bekijken, de gevangenis bezoeken, gevangenen-chat lezen.
+    default: op
