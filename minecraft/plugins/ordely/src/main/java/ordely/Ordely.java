@@ -26,6 +26,7 @@ public final class Ordely extends JavaPlugin {
     private Logboek logboek;
     private Gevangenis gevangenis;
     private Regels regels;
+    private Economie economie;
     private JsonObject data;
 
     @Override
@@ -38,6 +39,12 @@ public final class Ordely extends JavaPlugin {
         getServer().getPluginManager().registerEvents(gevangenis, this);
         getServer().getPluginManager().registerEvents(regels, this);
         getServer().getPluginManager().registerEvents(new CreativeBlokken(this), this);
+        economie = new Economie(this);
+        getServer().getPluginManager().registerEvents(economie, this);
+        PluginCommand vk = getCommand("ordelyverkoop");
+        if (vk != null) vk.setExecutor(economie);
+        // pas als alle plugins aan staan (Essentials, QuickShop)
+        Bukkit.getScheduler().runTask(this, economie::registreerVangnetten);
         Commando cmd = new Commando(this);
         PluginCommand pc = getCommand("gevangenis");
         if (pc != null) { pc.setExecutor(cmd); pc.setTabCompleter(cmd); }
@@ -75,12 +82,14 @@ public final class Ordely extends JavaPlugin {
     void herlaad() {
         reloadConfig();
         regels.laad();
+        economie.laad();
         gevangenis.laadConfig();
     }
 
     Logboek logboek() { return logboek; }
     Gevangenis gevangenis() { return gevangenis; }
     Regels regels() { return regels; }
+    Economie economie() { return economie; }
 
     // ------------------------------------------------------------ data.json
     JsonObject data() { return data; }

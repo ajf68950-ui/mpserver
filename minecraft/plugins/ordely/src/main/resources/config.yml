@@ -62,6 +62,45 @@ creative:
   # Mobs uit spawn-eieren (in creative) of /summon laten niets vallen.
   gespawnde-mobs-geven-niets: true
 
+economie:
+  # Geld verdien je alleen in Skyblock en OneBlock, door te verkopen via de GUI (de Opkoper en de winkel /shop),
+  # en alleen in survival. Dat geld neem je mee en geef je uit in de survivalwereld.
+  aan: true
+  # Alleen hier kun je verkopen (via de GUI).
+  verkoop-werelden:
+  - SuperiorWorld
+  - SuperiorWorld_nether
+  - SuperiorWorld_the_end
+  - oneblock_world
+  - oneblock_world_nether
+  - oneblock_world_the_end
+  # Hier werkt geld (betalen, winkels, kluis-markt). De verkoop-werelden horen er vanzelf bij.
+  # In alle andere werelden (plots, minigames, parkour, PvP, hardcore...) werken de geld-commando's niet.
+  geld-werelden:
+  - MPServer
+  - MPServer_nether
+  - MPServer_the_end
+  # Verkopen met een getypt commando werkt nergens, voor niemand (ook niet voor OP).
+  # De Opkoper-knoppen verkopen via de console met "ordelyverkoop <speler> <inventory|hand>".
+  verkoop-commandos:
+  - sell
+  - esell
+  - sellall
+  - sellhand
+  # Commando's met geld: werken alleen in de geld-werelden. "commando subcommando" = alleen dat subcommando.
+  geld-commandos:
+  - pay
+  - epay
+  - opkoper
+  - shop
+  - shopsell
+  - shopbuy
+  - qs
+  - quickshop
+  - kluis markt
+  - kluis upgrade
+  - kluis kopen
+
 gevangenis:
   wereld: gevangenis
   # false = straf loopt in echte tijd (ook als de speler offline is), true = alleen als hij online is.

@@ -121,7 +121,7 @@ final class Regels implements Listener {
     }
 
     /** Alle namen waaronder dit commando bekend is: wat getypt is, de echte naam en de aliassen. */
-    private static Set<String> namen(String label) {
+    static Set<String> namen(String label) {
         Set<String> n = new HashSet<>();
         n.add(zonderNamespace(label));
         Command cmd = Bukkit.getCommandMap().getCommand(label);
