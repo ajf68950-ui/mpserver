@@ -27,6 +27,7 @@ public final class Ordely extends JavaPlugin {
     private Gevangenis gevangenis;
     private Regels regels;
     private Economie economie;
+    private Poorten poorten;
     private JsonObject data;
 
     @Override
@@ -49,6 +50,11 @@ public final class Ordely extends JavaPlugin {
         PluginCommand pc = getCommand("gevangenis");
         if (pc != null) { pc.setExecutor(cmd); pc.setTabCompleter(cmd); }
         gevangenis.start();
+        poorten = new Poorten(this);
+        getServer().getPluginManager().registerEvents(poorten, this);
+        PluginCommand po = getCommand("poort");
+        if (po != null) { po.setExecutor(poorten); po.setTabCompleter(poorten); }
+        poorten.start();
         // Geld-correcties pas als de economy (Essentials via Vault) klaar is
         Bukkit.getScheduler().runTaskLater(this, () -> new Correcties(this).voerUit(), 100L);
         Bukkit.getScheduler().runTaskLater(this, this::stelMultiverseInventoriesIn, 60L);
@@ -77,6 +83,7 @@ public final class Ordely extends JavaPlugin {
     @Override
     public void onDisable() {
         if (gevangenis != null) gevangenis.stop();
+        if (poorten != null) poorten.stop();
     }
 
     void herlaad() {

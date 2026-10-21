@@ -177,3 +177,11 @@ correcties: {}
 #     naam: Spelernaam
 #     geld-zetten-op: 1000
 #     reden: Waarom het saldo wordt aangepast
+
+# Automatische poorten (/poort). De poorten zelf staan in poorten.json.
+poorten:
+  # Zoveel milliseconden nadat de laatste speler weg is, gaat de poort weer dicht.
+  dicht-na-ms: 1000
+  # Geluid bij open en dicht (Minecraft-geluidsnaam; leeg = geen geluid).
+  geluid-open: block.iron_door.open
+  geluid-dicht: block.iron_door.close

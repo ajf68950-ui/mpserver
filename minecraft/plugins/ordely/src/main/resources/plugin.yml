@@ -2,13 +2,16 @@ name: Ordely
 version: '${project.version}'
 main: ordely.Ordely
 api-version: '26.2'
-description: Regels op de server (geld en items alleen via de website, verkopen alleen via de GUI in Skyblock en OneBlock, geen geld uit creative) en een gevangenis met logboek.
+description: Regels op de server (geld en items alleen via de website, verkopen alleen via de GUI in Skyblock en OneBlock, geen geld uit creative) een gevangenis met logboek en automatische poorten.
 softdepend: [Vault, Essentials, Multiverse-Core, Multiverse-Inventories, Vaulty, Muntly, QuickShop-Hikari, DeluxeMenus]
 commands:
   gevangenis:
     description: De gevangenis - iemand opsluiten, vrijlaten, lijst en logboek.
     usage: /gevangenis [info | stuur | vrij | lijst | log | tp | herbouw | herladen]
     aliases: [gev, ordely]
+  poort:
+    description: Automatische poorten die vanzelf open en dicht gaan als er iemand langs loopt.
+    usage: /poort [hoek1 | hoek2 | maak <naam> [afstand] | lijst | afstand <naam> <blokken> | weg <naam>]
   ordelyverkoop:
     description: Alleen voor de console - de verkoopknoppen in het menu (Opkoper) gebruiken dit.
     usage: ordelyverkoop <speler> <inventory|hand>
@@ -16,6 +19,9 @@ permissions:
   ordely.gebruik:
     description: Je eigen straf bekijken met /gevangenis info.
     default: true
+  ordely.poort:
+    description: Automatische poorten maken en weghalen met /poort.
+    default: op
   ordely.beheer:
     description: Spelers opsluiten en vrijlaten, logboek bekijken, de gevangenis bezoeken, gevangenen-chat lezen.
     default: op
