@@ -55,12 +55,25 @@ if (-not (Test-Path -LiteralPath $Plugins)) { Write-Host "Pluginmap niet gevonde
 
 Write-Host 'Eigen plugins controleren...' -ForegroundColor Cyan
 $geinstalleerd = @(Get-ChildItem -LiteralPath $Plugins -Filter '*.jar' -File | ForEach-Object { Get-PluginInfo $_.FullName } | Where-Object { $_ })
-$bronJars = @(Get-ChildItem -LiteralPath $Bron -Filter '*.jar' -File | ForEach-Object { Get-PluginInfo $_.FullName } | Where-Object { $_ })
+$alleBron = @(Get-ChildItem -LiteralPath $Bron -Filter '*.jar' -File | ForEach-Object { Get-PluginInfo $_.FullName } | Where-Object { $_ })
+# per plugin alleen de nieuwste jar uit Resources gebruiken; oudere versies daar weghalen (staan ook op GitHub)
+$bronJars = @()
+foreach ($groep in @($alleBron | Group-Object Naam)) {
+    $nieuwste = $groep.Group[0]
+    foreach ($g in $groep.Group) { if ((Compare-Versie $g.Versie $nieuwste.Versie) -gt 0) { $nieuwste = $g } }
+    foreach ($g in $groep.Group) {
+        if ($g.Pad -ne $nieuwste.Pad) {
+            Remove-Item -LiteralPath $g.Pad -Force -ErrorAction SilentlyContinue
+            Write-Host "  $(Split-Path -Leaf $g.Pad): oudere versie uit Resources\eigen-plugins gehaald (nieuwste is $($nieuwste.Versie))." -ForegroundColor DarkGray
+        }
+    }
+    $bronJars += $nieuwste
+}
 $veranderd = 0
 
 foreach ($b in $bronJars) {
     $goedeNaam = "$($b.Naam)-$($b.Versie).jar"
-    $op = @($geinstalleerd | Where-Object { $_.Naam -eq $b.Naam })
+    $op = @($geinstalleerd | Where-Object { $_.Naam -eq $b.Naam -and (Test-Path -LiteralPath $_.Pad) })
     try {
         if ($op.Count -eq 0) {
             Copy-Item -LiteralPath $b.Pad -Destination (Join-Path $Plugins $goedeNaam) -Force
@@ -84,7 +97,7 @@ foreach ($b in $bronJars) {
         $alGoed = ($op.Count -eq 1) -and ($op[0].Pad -eq $doelPad) -and ((Get-Hash $op[0].Pad) -eq (Get-Hash $b.Pad))
         if ($alGoed) { Write-Host "  $($b.Naam) $($b.Versie): is al bijgewerkt."; continue }
         $oud = ($op | ForEach-Object { Split-Path -Leaf $_.Pad }) -join ', '
-        foreach ($o in $op) { Remove-Item -LiteralPath $o.Pad -Force }
+        foreach ($o in $op) { Remove-Item -LiteralPath $o.Pad -Force -ErrorAction SilentlyContinue }
         Copy-Item -LiteralPath $b.Pad -Destination $doelPad -Force
         Write-Host "  $($b.Naam): $oud -> $goedeNaam" -ForegroundColor Green
         $veranderd++
@@ -105,4 +118,10 @@ if (Test-Path -LiteralPath $Update) {
     }
 }
 if ($veranderd -eq 0) { Write-Host '  Alles is al up-to-date.' }
+
+# eenmalige stappen die moeten gebeuren terwijl de servers uit staan
+$eenmalig = Join-Path $PSScriptRoot 'mvinv-survival-groep.ps1'
+if (Test-Path -LiteralPath $eenmalig) {
+    try { & $eenmalig } catch { Write-Host "  mvinv-survival-groep.ps1 mislukt: $($_.Exception.Message)" -ForegroundColor Red }
+}
 exit 0

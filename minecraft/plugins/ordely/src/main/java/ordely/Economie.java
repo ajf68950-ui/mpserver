@@ -35,7 +35,7 @@ import java.util.UUID;
 
 /**
  * Economie-regels:
- * - Verkopen kan alleen via de GUI (Opkoper en winkel) in de verkoop-werelden (Skyblock en OneBlock), in survival.
+ * - Verkopen kan alleen via de GUI (Opkoper en winkel) in de verkoop-werelden, in survival.
  *   Getypte verkoopcommando's (/sell enz.) werken nergens, ook niet voor OP.
  *   De GUI verkoopt via de console: "ordelyverkoop <speler> <inventory|hand>".
  * - Geld werkt alleen in de geld-werelden (survival, Skyblock, OneBlock). In andere werelden (plots, minigames...)
@@ -70,6 +70,8 @@ final class Economie implements Listener, CommandExecutor {
         geldWerelden.addAll(verkoopWerelden);
         verkoopCommandos.clear();
         c.getStringList("economie.verkoop-commandos").forEach(w -> verkoopCommandos.add(w.toLowerCase(Locale.ROOT)));
+        verkoopTekst = c.getString("economie.tekst-verkopen", "de survivalwereld, Skyblock en OneBlock");
+        geldTekst = c.getString("economie.tekst-geld", "de survivalwereld, Skyblock en OneBlock");
         geldCommandos.clear();
         for (String s : c.getStringList("economie.geld-commandos")) {
             String[] p = s.trim().toLowerCase(Locale.ROOT).split("\\s+");
@@ -81,7 +83,9 @@ final class Economie implements Listener, CommandExecutor {
     boolean isGeldWereld(World w) { return w != null && geldWerelden.contains(w.getName().toLowerCase(Locale.ROOT)); }
     private static boolean survival(Player p) { return p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE; }
 
-    private String verkoopWereldenTekst() { return "Skyblock en OneBlock"; }
+    private String verkoopTekst = "de survivalwereld, Skyblock en OneBlock";
+    private String geldTekst = "de survivalwereld, Skyblock en OneBlock";
+    private String verkoopWereldenTekst() { return verkoopTekst; }
 
     // ------------------------------------------------------------ getypte commando's (na de gevangenis- en geef-regels)
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -103,14 +107,14 @@ final class Economie implements Listener, CommandExecutor {
                 Ordely.regel(p, "Verkopen kan niet in creative of als toeschouwer.");
                 plugin.regels().overtreding(p, "creative-verkopen", "probeerde te verkopen in " + p.getGameMode().name().toLowerCase(Locale.ROOT) + " (" + kort(raw) + ")");
             } else {
-                Ordely.regel(p, "Verkopen met een commando kan niet. Verkoop via de Opkoper of de winkel (/shop) in " + verkoopWereldenTekst() + ".");
+                Ordely.regel(p, "Verkopen met een commando kan niet. Verkoop via de Opkoper of de winkel (/shop), in " + verkoopWereldenTekst() + ".");
             }
             return;
         }
         // 2. Geldcommando's alleen in de geld-werelden
         if (!isGeldWereld(p.getWorld()) && isGeldCommando(namen, args)) {
             e.setCancelled(true);
-            Ordely.regel(p, "Geld werkt niet in deze wereld. Dat kan alleen in de survivalwereld, Skyblock en OneBlock.");
+            Ordely.regel(p, "Geld werkt niet in deze wereld. Dat kan alleen in " + geldTekst + ".");
         }
     }
 
@@ -152,7 +156,7 @@ final class Economie implements Listener, CommandExecutor {
             return true;
         }
         if (!isVerkoopWereld(p.getWorld())) {
-            Ordely.regel(p, "Verkopen kan alleen in " + verkoopWereldenTekst() + ". Wat je daar verdient, kun je overal in de survivalwereld uitgeven.");
+            Ordely.regel(p, "Verkopen kan alleen in " + verkoopWereldenTekst() + ".");
             return true;
         }
         if (wat.equals("item")) { verkoopItem(p, mat, aantal, bedrag); return true; }
@@ -268,7 +272,7 @@ final class Economie implements Listener, CommandExecutor {
         if (ok) return;
         Method set = e.getClass().getMethod("setNewBalance", BigDecimal.class);
         set.invoke(e, oud);
-        Ordely.regel(p, "Verkopen kan alleen via de Opkoper of de winkel in " + verkoopWereldenTekst() + ". Je krijgt hier geen geld voor.");
+        Ordely.regel(p, "Verkopen kan alleen via de Opkoper of de winkel, in " + verkoopWereldenTekst() + ". Je krijgt hier geen geld voor.");
         plugin.logboek().schrijf("WAARSCHUWING", p.getName(), p.getUniqueId(),
                 "verkoop buiten de GUI tegengehouden in " + p.getWorld().getName() + " (" + p.getGameMode().name().toLowerCase(Locale.ROOT) + "), $" + nieuw.subtract(oud).toPlainString() + " niet uitbetaald", -1, "systeem", "economie");
     }

@@ -63,11 +63,15 @@ creative:
   gespawnde-mobs-geven-niets: true
 
 economie:
-  # Geld verdien je alleen in Skyblock en OneBlock, door te verkopen via de GUI (de Opkoper en de winkel /shop),
-  # en alleen in survival. Dat geld neem je mee en geef je uit in de survivalwereld.
+  # Geld verdien je alleen door te verkopen via de GUI (de Opkoper en de winkel /shop), alleen in survival,
+  # en alleen in de verkoop-werelden. Getypte verkoopcommando's werken nergens.
   aan: true
-  # Alleen hier kun je verkopen (via de GUI).
+  # Alleen hier kun je verkopen (via de GUI). De Opkoper bij de spawn werkt in de survivalwereld, de nether en de end;
+  # de winkel (/shop) heeft zijn eigen eis in DeluxeMenus (alleen Skyblock en OneBlock).
   verkoop-werelden:
+  - MPServer
+  - MPServer_nether
+  - MPServer_the_end
   - SuperiorWorld
   - SuperiorWorld_nether
   - SuperiorWorld_the_end
@@ -80,6 +84,9 @@ economie:
   - MPServer
   - MPServer_nether
   - MPServer_the_end
+  # Teksten in de meldingen: waar je kunt verkopen en waar geld werkt.
+  tekst-verkopen: de survivalwereld, Skyblock en OneBlock
+  tekst-geld: de survivalwereld, Skyblock en OneBlock
   # Verkopen met een getypt commando werkt nergens, voor niemand (ook niet voor OP).
   # De Opkoper-knoppen verkopen via de console met "ordelyverkoop <speler> <inventory|hand>".
   verkoop-commandos:
