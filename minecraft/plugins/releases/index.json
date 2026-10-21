@@ -1,5 +1,5 @@
 {
-  "bijgewerkt": "2026-10-17",
+  "bijgewerkt": "2026-10-21",
   "plugins": [
     {
       "naam": "Vaulty",
@@ -41,6 +41,13 @@
       "versie": "1.2.0",
       "bestand": "Ordely-1.2.0.jar",
       "sha1": "e83c74e9e22ac48dc0be5197963f9c90e5f0267d",
+      "minecraft": "26.2"
+    },
+    {
+      "naam": "Meldly",
+      "versie": "1.0.0",
+      "bestand": "Meldly-1.0.0.jar",
+      "sha1": "3f1d7b0cd16fea09a5afa3e2fe9f13b31c502eb5",
       "minecraft": "26.2"
     }
   ]

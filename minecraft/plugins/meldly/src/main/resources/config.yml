@@ -1,0 +1,144 @@
+# Meldly - Minecraft en Discord, voor meerdere Discord-servers tegelijk.
+# Het meeste stel je in via de website: Beheer > Discord (bot-token, servers, categorieën, koppelen).
+# Wat per Discord-server aan staat, staat in servers.yml. Gekoppelde accounts in koppelingen.yml.
+# Na het aanpassen van dit bestand: /discord herladen (of de server herstarten).
+
+bot:
+  # Het token van je Discord-bot (Discord Developer Portal > jouw app > Bot > Reset Token).
+  # Makkelijker: plak het in Beheer > Discord op de website. Deel dit nooit met anderen.
+  bot-token: ''
+
+web:
+  # De website praat via deze poort met de plugin. Alleen bereikbaar op deze pc, niet openzetten in je router.
+  host: 127.0.0.1
+  poort: 8097
+  # Wordt automatisch aangemaakt. De website leest dit zelf uit dit bestand.
+  token: ''
+
+algemeen:
+  # Uitnodigingslink van je Discord (wordt getoond bij /discord in het spel). Leeg = niet tonen.
+  uitnodiging: ''
+
+kanalen:
+  # Naam van de Discord-categorie waarin de bot zijn kanalen maakt.
+  categorie: 'MPServer'
+  # Namen van de kanalen die de bot maakt (bestaande kanalen kies je in het beheer).
+  namen:
+    chat: mc-chat
+    status: mc-status
+    spelers: mc-in-uit
+    doden: mc-doden
+    prestaties: mc-prestaties
+    commandos: mc-commandos
+    moderatie: mc-moderatie
+    economie: mc-economie
+    fouten: mc-fouten
+    koppelingen: mc-koppelingen
+  # Privé = alleen beheerders zien het kanaal (geldt voor kanalen die de bot nieuw maakt).
+  prive:
+    chat: false
+    status: false
+    spelers: false
+    doden: false
+    prestaties: false
+    commandos: true
+    moderatie: true
+    economie: true
+    fouten: true
+    koppelingen: true
+
+chat:
+  minecraft-naar-discord: true
+  discord-naar-minecraft: true
+  # Chat in Discord ook naar de chatkanalen van de andere Discord-servers sturen.
+  tussen-servers: false
+  # Ook "kwam online" en "ging offline" in het chatkanaal (naast het kanaal In- en uitloggen).
+  in-uit-in-chat: false
+  # Hoe Discord-berichten in het spel verschijnen. {naam}, {server} en {bericht}. Kleurcodes met &.
+  naar-minecraft: '&9[Discord] &7{naam}&8: &f{bericht}'
+  # Gekoppelde spelers verschijnen met hun Minecraft-naam.
+  minecraft-naam-als-gekoppeld: true
+  # Rang uit LuckPerms voor de naam in Discord, bijv. [VIP] Speler.
+  rang-voor-naam: true
+  # Chat in Discord met de naam en het hoofd van de speler (webhook). Uit = als bericht van de bot.
+  webhooks: true
+  max-lengte: 256
+  # Chat uit deze werelden gaat niet naar Discord (gevangenen praten alleen met elkaar).
+  niet-uit-werelden: [gevangenis]
+  ook-onzichtbaar: false
+
+status:
+  # Naam in het statusbericht.
+  servernaam: 'MPServer SMP'
+  # Adres voor spelers (leeg = niet tonen).
+  adres: ''
+  elke-seconden: 60
+  vastpinnen: true
+  # Tekst onder de naam van de bot. {spelers} en {max}. Leeg = geen tekst.
+  bot-tekst: '{spelers} van de {max} online'
+
+commandos:
+  # Commando's die nooit gelogd worden (privéberichten, wachtwoorden).
+  negeren: [msg, tell, w, m, t, whisper, pm, r, reply, mail, login, l, register, reg, changepassword, changepw, unregister, helpop, ac, staffchat, sc]
+  # Commando's van de website via RCON die niet gelogd worden (de website vraagt elke paar seconden 'list').
+  rcon-negeren: [list]
+  # Commando's uit de console loggen.
+  console: true
+  # Ook commando's van onzichtbare spelers (SuperVanish) loggen.
+  ook-onzichtbaar: true
+  # Extra commando's die ook in Moderatie komen (naast op, ban, kick, gamemode, gevangenis, ...).
+  ook-naar-moderatie: []
+
+moderatie:
+  # Ook spelmodus-wissels door plugins (bijv. Multiverse bij het wisselen van wereld) melden.
+  spelmodus-door-plugins: false
+
+fouten:
+  # Melding als de TPS hieronder zakt (0 = uit).
+  tps-alarm: 15.0
+  max-per-minuut: 20
+  # Meldingen uit het serverlog die niet naar Discord gaan (reguliere expressies).
+  negeren:
+    - "Option 'hide_attributes'"
+    - 'Ignoring attempt to change parent of plugin logger'
+    - 'is not a supported Floodgate language'
+    - 'OFFLINE/INSECURE MODE'
+    - 'make no attempt to authenticate'
+    - 'Legacy Material Support'
+    - 'moved too quickly'
+    - 'moved wrongly'
+    - 'SPIGOT version of BlueMap'
+    - "Can't keep up!"
+
+logs:
+  verzend-elke-seconden: 2
+
+# Logbestanden die Meldly volgt. Paden vanaf de servermap (MPServerSMP).
+# soort: serverlog (WARN/ERROR naar Fouten), ordely (logboek van Ordely naar Moderatie), tekst (elke regel).
+logbestanden:
+  - bestand: 'logs/latest.log'
+    soort: serverlog
+  - bestand: 'plugins/Ordely/logboek.jsonl'
+    soort: ordely
+    categorie: moderatie
+  - bestand: '../../Website/logs/economie.log'
+    soort: tekst
+    categorie: economie
+  - bestand: 'plugins/Muntly/logboek.txt'
+    soort: tekst
+    categorie: economie
+
+koppelen:
+  # Naam van de rol die de bot maakt als je in het beheer "Nieuwe rol maken" kiest.
+  rol-naam: 'Minecraft'
+
+uiterlijk:
+  # Plaatje van het hoofd van de speler. {naam} of {uuid}.
+  hoofd-url: 'https://mc-heads.net/avatar/{naam}/64'
+
+import:
+  # Bij de eerste start neemt Meldly het bot-token, het chatkanaal en de koppelingen van DiscordSRV over.
+  discordsrv-gedaan: false
+  discordsrv-chatkanaal: ''
+  # DiscordSRV uitschakelen als het nog in de map plugins staat (anders zou alles dubbel komen).
+  discordsrv-uitschakelen: true

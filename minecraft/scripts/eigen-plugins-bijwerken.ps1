@@ -1,7 +1,7 @@
 # ==========================================================================
 #  Eigen plugins bijwerken
 #  De jars van de eigen plugins (Vaulty, Muntly, Ordely, Pocketly, Toolwise,
-#  Statusbord) staan in Resources\eigen-plugins. Dit script zet de nieuwste
+#  Statusbord, Meldly) staan in Resources\eigen-plugins. Dit script zet de nieuwste
 #  versie in MPServerSMP\plugins, met de juiste naam (Naam-versie.jar).
 #  - Nieuwere versie in Resources  -> komt in plugins (oude jar gaat weg)
 #  - Nieuwere versie in plugins (bijv. via Update-plugins.bat) -> wordt ook in Resources gezet
@@ -118,6 +118,21 @@ if (Test-Path -LiteralPath $Update) {
     }
 }
 if ($veranderd -eq 0) { Write-Host '  Alles is al up-to-date.' }
+
+# DiscordSRV is vervangen door Meldly: de oude jar opzij zetten (niet weggooien), anders komt alles dubbel in Discord.
+# De map plugins\DiscordSRV blijft staan als reservekopie. Terugzetten = de jar uit Resources\vervangen-plugins terug in plugins zetten.
+if (@(Get-ChildItem -LiteralPath $Plugins -Filter 'Meldly-*.jar' -File -ErrorAction SilentlyContinue).Count -gt 0) {
+    foreach ($j in @(Get-ChildItem -LiteralPath $Plugins -Filter 'DiscordSRV*.jar' -File -ErrorAction SilentlyContinue)) {
+        try {
+            $opzij = Join-Path $PSScriptRoot 'vervangen-plugins'
+            New-Item -ItemType Directory -Path $opzij -Force | Out-Null
+            Move-Item -LiteralPath $j.FullName -Destination (Join-Path $opzij $j.Name) -Force
+            Write-Host "  $($j.Name): vervangen door Meldly, verplaatst naar Resources\vervangen-plugins." -ForegroundColor Yellow
+        } catch {
+            Write-Host "  $($j.Name) kon niet opzij gezet worden: $($_.Exception.Message)" -ForegroundColor Red
+        }
+    }
+}
 
 # eenmalige stappen die moeten gebeuren terwijl de servers uit staan
 $eenmalig = Join-Path $PSScriptRoot 'mvinv-survival-groep.ps1'
