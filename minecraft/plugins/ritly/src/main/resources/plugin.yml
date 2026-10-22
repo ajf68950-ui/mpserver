@@ -1,0 +1,28 @@
+name: Ritly
+version: '${project.version}'
+main: ritly.Ritly
+api-version: '26.2'
+description: Voertuigen - auto's, fietsen, boten en vliegtuigen kopen, samenstellen, bouwen en besturen, met winkels, NPC's en showrooms.
+softdepend: [Vault, Essentials, Citizens]
+commands:
+  garage:
+    description: Je garage - je voertuigen uitrijden, opbergen, samenstellen en bijtanken.
+    usage: /garage [opbergen | naam <naam> | bouw staf | bouw klaar <soort> [schaal] [naam] | help]
+    aliases: [voertuig, voertuigen, vt]
+  ritly:
+    description: Beheer van Ritly - winkels, NPC's, showrooms en modellen.
+    usage: /ritly [winkel | npc | showroom | bouw | modellen | geef | opruimen | herladen]
+    aliases: [rit]
+permissions:
+  ritly.gebruik:
+    description: Garage gebruiken, voertuigen kopen en besturen.
+    default: true
+  ritly.bouw.eigen:
+    description: Zelf een voertuig bouwen uit blokken (met /garage bouw).
+    default: true
+  ritly.beheer:
+    description: Winkels, NPC's, showrooms en modellen beheren.
+    default: op
+  ritly.omzeil:
+    description: Voertuigen van anderen besturen en opbergen, ook als ze op slot zitten.
+    default: op

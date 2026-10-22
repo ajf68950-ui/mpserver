@@ -49,6 +49,13 @@
       "bestand": "Meldly-1.1.0.jar",
       "sha1": "034e382bf341ce4551cffd37dbc5588d93ea9dc0",
       "minecraft": "26.2"
+    },
+    {
+      "naam": "Ritly",
+      "versie": "1.0.0",
+      "bestand": "Ritly-1.0.0.jar",
+      "sha1": "f4a01e9003dff947865932e7c390900e547492d2",
+      "minecraft": "26.2"
     }
   ]
 }

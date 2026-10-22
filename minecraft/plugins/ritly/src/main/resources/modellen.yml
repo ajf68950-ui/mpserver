@@ -1,0 +1,342 @@
+# Ritly modellen: elk voertuig is gemaakt van blokken (block displays).
+#
+# Coordinaten in blokken, vanaf het midden van het voertuig op de grond:
+#   x = links (+) / rechts (-), y = omhoog, z = voorkant (+) / achterkant (-)
+#
+# delen: "<blok> x1 y1 z1 x2 y2 z2 [vlaggen]"  = een blok uitgerekt van hoek (x1,y1,z1) tot hoek (x2,y2,z2)
+#   blok: elk Minecraft-blok, ook met eigenschappen, bijv. redstone_lamp[lit=true]
+#   Witte blokken (white_...) krijgen de lakkleur van het voertuig.
+#   vlaggen: draai:x  = draait rond als een wiel (met de snelheid)
+#            draai:z  = draait rond als een propeller (met het gas)
+#            rx:<graden> ry:<graden> rz:<graden> = schuin zetten
+# zitplaatsen: [x, y, z] van de stoel (waar je zit); de eerste is de bestuurder.
+# botsing: [breedte, lengte, hoogte] (optioneel, anders berekend uit de delen).
+# soort: fiets, auto, boot of vliegtuig.
+# max-snelheid km/u, acceleratie km/u per seconde, draaien graden per seconde,
+# tank liter, verbruik liter per 1000 blokken, opstijgen km/u (vliegtuig), diepgang (boot, hoe diep in het water).
+
+modellen:
+
+  stadsfiets:
+    naam: "&fStadsfiets"
+    soort: fiets
+    kleur: light_blue
+    icoon: saddle
+    max-snelheid: 20
+    acceleratie: 14
+    draaien: 120
+    zitplaatsen:
+    - [0, 0.9, -0.31]
+    botsing: [0.6, 1.8, 1.2]
+    delen:
+    - "black_concrete -0.04 0 -0.9 0.04 0.7 -0.2 draai:x"
+    - "black_concrete -0.04 0 0.2 0.04 0.7 0.9 draai:x"
+    - "light_gray_concrete -0.05 0.3 -0.6 0.05 0.4 -0.5 draai:x"
+    - "light_gray_concrete -0.05 0.3 0.5 0.05 0.4 0.6 draai:x"
+    - "white_concrete -0.035 0.75 -0.3 0.035 0.82 0.42"
+    - "white_concrete -0.035 0.35 -0.32 0.035 0.85 -0.25"
+    - "white_concrete -0.035 0.535 -0.338 0.035 0.605 0.478 rx:-31"
+    - "white_concrete -0.035 0.32 -0.55 0.035 0.39 -0.28"
+    - "white_concrete -0.03 0.545 -0.6825 0.03 0.605 -0.1675 rx:-61"
+    - "white_concrete -0.06 0.68 -0.85 0.06 0.72 -0.35"
+    - "gray_concrete -0.03 0.34 0.47 0.03 0.86 0.53 rx:-11"
+    - "gray_concrete -0.03 0.82 0.42 0.03 1.05 0.48"
+    - "black_concrete -0.3 1.03 0.4 0.3 1.08 0.46"
+    - "black_wool -0.09 0.85 -0.42 0.09 0.9 -0.2"
+    - "gray_concrete -0.15 0.33 -0.3 0.15 0.39 -0.26"
+    - "brown_terracotta -0.15 0.86 0.5 0.15 1.04 0.76"
+    - "sea_lantern -0.04 0.9 0.76 0.04 0.96 0.79"
+
+  mountainbike:
+    naam: "&aMountainbike"
+    soort: fiets
+    kleur: lime
+    icoon: saddle
+    max-snelheid: 26
+    acceleratie: 18
+    draaien: 130
+    zitplaatsen:
+    - [0, 0.92, -0.31]
+    botsing: [0.6, 1.8, 1.2]
+    delen:
+    - "black_concrete -0.06 0 -0.9 0.06 0.72 -0.18 draai:x"
+    - "black_concrete -0.06 0 0.18 0.06 0.72 0.9 draai:x"
+    - "gray_concrete -0.07 0.31 -0.59 0.07 0.41 -0.49 draai:x"
+    - "gray_concrete -0.07 0.31 0.49 0.07 0.41 0.59 draai:x"
+    - "white_concrete -0.04 0.72 -0.3 0.04 0.8 0.42"
+    - "white_concrete -0.04 0.35 -0.33 0.04 0.86 -0.25"
+    - "white_concrete -0.04 0.53 -0.338 0.04 0.61 0.478 rx:-31"
+    - "white_concrete -0.04 0.32 -0.55 0.04 0.4 -0.28"
+    - "white_concrete -0.035 0.545 -0.6825 0.035 0.615 -0.1675 rx:-61"
+    - "iron_block -0.045 0.34 0.47 0.045 0.86 0.55 rx:-11"
+    - "gray_concrete -0.03 0.82 0.42 0.03 1.02 0.48"
+    - "black_concrete -0.34 1.0 0.4 0.34 1.05 0.46"
+    - "black_wool -0.08 0.86 -0.42 0.08 0.92 -0.2"
+    - "gray_concrete -0.15 0.33 -0.31 0.15 0.39 -0.26"
+
+  gezinsauto:
+    naam: "&fGezinsauto"
+    soort: auto
+    kleur: red
+    icoon: minecart
+    max-snelheid: 65
+    acceleratie: 22
+    draaien: 90
+    tank: 40
+    verbruik: 8
+    zitplaatsen:
+    - [0.4, 0.6, -0.05]
+    - [-0.4, 0.6, -0.05]
+    - [0.4, 0.6, -0.75]
+    - [-0.4, 0.6, -0.75]
+    botsing: [1.7, 3.8, 1.85]
+    delen:
+    # wielen
+    - "black_concrete 0.78 0 0.85 1.0 0.62 1.47 draai:x"
+    - "black_concrete -1.0 0 0.85 -0.78 0.62 1.47 draai:x"
+    - "black_concrete 0.78 0 -1.47 1.0 0.62 -0.85 draai:x"
+    - "black_concrete -1.0 0 -1.47 -0.78 0.62 -0.85 draai:x"
+    - "light_gray_concrete 1.0 0.16 1.0 1.02 0.46 1.32 draai:x"
+    - "light_gray_concrete -1.02 0.16 1.0 -1.0 0.46 1.32 draai:x"
+    - "light_gray_concrete 1.0 0.16 -1.32 1.02 0.46 -1.0 draai:x"
+    - "light_gray_concrete -1.02 0.16 -1.32 -1.0 0.46 -1.0 draai:x"
+    # carrosserie
+    - "white_concrete -0.85 0.3 -1.15 0.85 0.45 0.65"
+    - "white_concrete -0.85 0.3 0.65 0.85 0.95 1.8"
+    - "white_concrete -0.85 0.3 -1.8 0.85 0.95 -1.15"
+    - "white_concrete 0.75 0.45 -1.15 0.85 0.95 0.65"
+    - "white_concrete -0.85 0.45 -1.15 -0.75 0.95 0.65"
+    - "white_concrete 0.75 0.95 0.55 0.85 1.75 0.65"
+    - "white_concrete -0.85 0.95 0.55 -0.75 1.75 0.65"
+    - "white_concrete 0.75 0.95 -0.25 0.85 1.75 -0.18"
+    - "white_concrete -0.85 0.95 -0.25 -0.75 1.75 -0.18"
+    - "white_concrete 0.75 0.95 -1.15 0.85 1.75 -1.05"
+    - "white_concrete -0.85 0.95 -1.15 -0.75 1.75 -1.05"
+    - "white_concrete -0.85 1.75 -1.15 0.85 1.85 0.65"
+    # ramen
+    - "light_blue_stained_glass -0.75 0.95 0.58 0.75 1.75 0.62"
+    - "light_blue_stained_glass -0.75 0.95 -1.12 0.75 1.75 -1.08"
+    - "light_blue_stained_glass 0.8 0.95 -1.05 0.82 1.75 0.55"
+    - "light_blue_stained_glass -0.82 0.95 -1.05 -0.8 1.75 0.55"
+    # binnen
+    - "gray_wool 0.15 0.45 -0.2 0.65 0.6 0.25"
+    - "gray_wool -0.65 0.45 -0.2 -0.15 0.6 0.25"
+    - "gray_wool 0.15 0.6 -0.3 0.65 1.3 -0.2"
+    - "gray_wool -0.65 0.6 -0.3 -0.15 1.3 -0.2"
+    - "gray_wool -0.7 0.45 -0.95 0.7 0.6 -0.5"
+    - "gray_wool -0.7 0.6 -1.05 0.7 1.3 -0.95"
+    - "black_concrete -0.75 0.85 0.45 0.75 1.0 0.58"
+    - "black_concrete 0.25 0.95 0.38 0.55 1.2 0.42 rx:-20"
+    # voor en achter
+    - "sea_lantern 0.5 0.6 1.8 0.8 0.8 1.84"
+    - "sea_lantern -0.8 0.6 1.8 -0.5 0.8 1.84"
+    - "redstone_lamp[lit=true] 0.5 0.65 -1.84 0.8 0.85 -1.8"
+    - "redstone_lamp[lit=true] -0.8 0.65 -1.84 -0.5 0.85 -1.8"
+    - "gray_concrete -0.88 0.25 1.8 0.88 0.42 1.9"
+    - "gray_concrete -0.88 0.25 -1.9 0.88 0.42 -1.8"
+    - "black_concrete -0.4 0.5 1.8 0.4 0.75 1.82"
+    - "yellow_concrete -0.25 0.27 1.9 0.25 0.4 1.92"
+    - "yellow_concrete -0.25 0.45 -1.83 0.25 0.6 -1.8"
+    - "black_concrete 0.85 1.0 0.5 0.98 1.12 0.6"
+    - "black_concrete -0.98 1.0 0.5 -0.85 1.12 0.6"
+
+  sportwagen:
+    naam: "&cSportwagen"
+    soort: auto
+    kleur: red
+    icoon: minecart
+    max-snelheid: 110
+    acceleratie: 45
+    draaien: 100
+    tank: 50
+    verbruik: 12
+    zitplaatsen:
+    - [0.42, 0.5, -0.35]
+    - [-0.42, 0.5, -0.35]
+    botsing: [1.9, 4.0, 1.2]
+    delen:
+    - "black_concrete 0.8 0 1.0 1.02 0.64 1.64 draai:x"
+    - "black_concrete -1.02 0 1.0 -0.8 0.64 1.64 draai:x"
+    - "black_concrete 0.8 0 -1.64 1.02 0.64 -1.0 draai:x"
+    - "black_concrete -1.02 0 -1.64 -0.8 0.64 -1.0 draai:x"
+    - "light_gray_concrete 1.02 0.17 1.17 1.04 0.47 1.47 draai:x"
+    - "light_gray_concrete -1.04 0.17 1.17 -1.02 0.47 1.47 draai:x"
+    - "light_gray_concrete 1.02 0.17 -1.47 1.04 0.47 -1.17 draai:x"
+    - "light_gray_concrete -1.04 0.17 -1.47 -1.02 0.47 -1.17 draai:x"
+    - "white_concrete -0.95 0.25 -0.9 0.95 0.38 0.5"
+    - "white_concrete -0.95 0.25 0.5 0.95 0.72 2.0"
+    - "white_concrete -0.95 0.25 -2.0 0.95 0.8 -0.9"
+    - "white_concrete 0.83 0.38 -0.9 0.95 0.8 0.5"
+    - "white_concrete -0.95 0.38 -0.9 -0.83 0.8 0.5"
+    - "black_concrete -0.15 0.72 0.5 0.15 0.73 2.0"
+    - "light_blue_stained_glass -0.8 0.72 0.42 0.8 1.15 0.46 rx:-25"
+    - "black_concrete -0.82 1.1 0.3 0.82 1.15 0.38"
+    - "black_wool 0.15 0.38 -0.6 0.7 0.5 -0.1"
+    - "black_wool -0.7 0.38 -0.6 -0.15 0.5 -0.1"
+    - "black_wool 0.15 0.5 -0.72 0.7 1.05 -0.62"
+    - "black_wool -0.7 0.5 -0.72 -0.15 1.05 -0.62"
+    - "black_concrete -0.83 0.72 0.3 0.83 0.8 0.5"
+    - "black_concrete 0.27 0.75 0.18 0.57 1.0 0.22 rx:-20"
+    - "black_concrete -0.9 1.0 -2.0 0.9 1.06 -1.75"
+    - "black_concrete 0.6 0.8 -1.92 0.66 1.0 -1.85"
+    - "black_concrete -0.66 0.8 -1.92 -0.6 1.0 -1.85"
+    - "sea_lantern 0.55 0.5 2.0 0.85 0.62 2.03"
+    - "sea_lantern -0.85 0.5 2.0 -0.55 0.62 2.03"
+    - "redstone_lamp[lit=true] 0.55 0.6 -2.03 0.85 0.72 -2.0"
+    - "redstone_lamp[lit=true] -0.85 0.6 -2.03 -0.55 0.72 -2.0"
+    - "gray_concrete 0.3 0.28 -2.08 0.45 0.38 -2.0"
+    - "gray_concrete -0.45 0.28 -2.08 -0.3 0.38 -2.0"
+    - "yellow_concrete -0.25 0.3 2.0 0.25 0.43 2.02"
+
+  jetski:
+    naam: "&bJetski"
+    soort: boot
+    kleur: yellow
+    icoon: oak_boat
+    max-snelheid: 70
+    acceleratie: 35
+    draaien: 120
+    tank: 20
+    verbruik: 8
+    diepgang: 0.25
+    zitplaatsen:
+    - [0, 0.6, -0.25]
+    - [0, 0.6, -0.75]
+    botsing: [0.9, 2.2, 0.9]
+    delen:
+    - "white_concrete -0.45 0 -1.1 0.45 0.45 0.8"
+    - "white_concrete -0.3 0.05 0.8 0.3 0.42 1.1"
+    - "black_concrete -0.46 0.25 -1.1 0.46 0.32 0.8"
+    - "black_wool -0.22 0.45 -0.95 0.22 0.6 0.1"
+    - "gray_concrete -0.06 0.45 0.35 0.06 0.85 0.47 rx:-15"
+    - "black_concrete -0.32 0.85 0.32 0.32 0.9 0.4"
+    - "light_blue_stained_glass -0.2 0.45 0.55 0.2 0.6 0.75 rx:-20"
+
+  speedboot:
+    naam: "&fSpeedboot"
+    soort: boot
+    kleur: white
+    icoon: oak_boat
+    max-snelheid: 55
+    acceleratie: 18
+    draaien: 70
+    tank: 60
+    verbruik: 10
+    diepgang: 0.35
+    zitplaatsen:
+    - [0.42, 0.55, -0.12]
+    - [-0.42, 0.55, -0.12]
+    - [0.4, 0.6, -1.7]
+    - [-0.4, 0.6, -1.7]
+    botsing: [1.8, 4.6, 1.1]
+    delen:
+    - "white_concrete -0.9 0 -2.1 0.9 0.35 1.3"
+    - "white_concrete -0.65 0.05 1.3 0.65 0.75 1.75"
+    - "white_concrete -0.35 0.12 1.75 0.35 0.75 2.05"
+    - "spruce_planks -0.78 0.35 -1.98 0.78 0.4 1.3"
+    - "white_concrete 0.78 0.35 -2.1 0.9 0.8 1.3"
+    - "white_concrete -0.9 0.35 -2.1 -0.78 0.8 1.3"
+    - "white_concrete -0.78 0.35 -2.1 0.78 0.8 -1.98"
+    - "white_concrete -0.78 0.6 0.6 0.78 0.75 1.3"
+    - "blue_concrete 0.9 0.45 -2.1 0.92 0.55 1.3"
+    - "blue_concrete -0.92 0.45 -2.1 -0.9 0.55 1.3"
+    - "light_blue_stained_glass -0.75 0.75 0.55 0.75 1.15 0.6 rx:-20"
+    - "black_concrete 0.15 0.4 0.3 0.7 0.85 0.55"
+    - "black_concrete 0.3 0.85 0.28 0.55 1.05 0.32 rx:-20"
+    - "gray_wool 0.15 0.4 -0.35 0.7 0.55 0.1"
+    - "gray_wool -0.7 0.4 -0.35 -0.15 0.55 0.1"
+    - "gray_wool 0.15 0.55 -0.45 0.7 1.0 -0.35"
+    - "gray_wool -0.7 0.55 -0.45 -0.15 1.0 -0.35"
+    - "gray_wool -0.75 0.4 -1.95 0.75 0.6 -1.45"
+    - "black_concrete -0.25 0.1 -2.5 0.25 0.85 -2.1"
+    - "gray_concrete -0.22 0.85 -2.45 0.22 0.95 -2.15"
+
+  sportvliegtuig:
+    naam: "&fSportvliegtuig"
+    soort: vliegtuig
+    kleur: white
+    icoon: elytra
+    max-snelheid: 120
+    acceleratie: 20
+    draaien: 45
+    tank: 100
+    verbruik: 10
+    opstijgen: 55
+    zitplaatsen:
+    - [0.28, 1.05, 0.35]
+    - [-0.28, 1.05, 0.35]
+    botsing: [1.4, 6.0, 2.35]
+    delen:
+    # landingsgestel
+    - "black_concrete 0.75 0 -0.1 0.9 0.5 0.4 draai:x"
+    - "black_concrete -0.9 0 -0.1 -0.75 0.5 0.4 draai:x"
+    - "gray_concrete 0.55 0.25 0.1 0.75 0.65 0.2"
+    - "gray_concrete -0.75 0.25 0.1 -0.55 0.65 0.2"
+    - "black_concrete -0.08 0 1.35 0.08 0.4 1.75 draai:x"
+    - "gray_concrete -0.04 0.35 1.5 0.04 0.65 1.6"
+    # romp
+    - "white_concrete -0.6 0.6 -1.0 0.6 1.0 1.4"
+    - "white_concrete 0.55 1.0 -0.6 0.6 1.3 1.0"
+    - "white_concrete -0.6 1.0 -0.6 -0.55 1.3 1.0"
+    - "light_blue_stained_glass 0.57 1.3 -0.6 0.6 2.2 1.0"
+    - "light_blue_stained_glass -0.6 1.3 -0.6 -0.57 2.2 1.0"
+    - "light_blue_stained_glass -0.55 1.3 1.0 0.55 2.2 1.05 rx:-15"
+    - "white_concrete -0.5 0.7 1.4 0.5 1.6 2.1"
+    - "gray_concrete -0.25 0.95 2.1 0.25 1.35 2.3"
+    - "black_concrete -0.08 0.25 2.3 0.08 2.05 2.36 draai:z"
+    - "white_concrete -0.6 0.75 -1.6 0.6 2.2 -0.6"
+    - "white_concrete -0.45 0.95 -2.6 0.45 1.8 -1.6"
+    - "white_concrete -0.3 1.1 -3.3 0.3 1.6 -2.6"
+    # binnen
+    - "gray_wool 0.05 0.95 0.1 0.5 1.05 0.6"
+    - "gray_wool -0.5 0.95 0.1 -0.05 1.05 0.6"
+    - "gray_wool 0.05 1.05 0.0 0.5 1.6 0.1"
+    - "gray_wool -0.5 1.05 0.0 -0.05 1.6 0.1"
+    - "black_concrete -0.55 1.2 0.92 0.55 1.4 1.0"
+    # vleugels en staart
+    - "white_concrete -4.2 2.2 -0.4 4.2 2.35 0.9"
+    - "red_concrete 4.2 2.2 -0.4 4.4 2.35 0.9"
+    - "green_concrete -4.4 2.2 -0.4 -4.2 2.35 0.9"
+    - "gray_concrete 0.337 1.47 0.21 2.463 1.53 0.29 rz:41"
+    - "gray_concrete -2.463 1.47 0.21 -0.337 1.53 0.29 rz:-41"
+    - "white_concrete -1.6 1.4 -3.5 1.6 1.5 -2.8"
+    - "white_concrete -0.05 1.6 -3.5 0.05 2.6 -2.8"
+    - "red_concrete -0.05 2.6 -3.5 0.05 2.7 -2.95"
+
+  straaljager:
+    naam: "&7Straaljager"
+    soort: vliegtuig
+    kleur: light_gray
+    icoon: elytra
+    max-snelheid: 200
+    acceleratie: 40
+    draaien: 60
+    tank: 150
+    verbruik: 25
+    opstijgen: 100
+    zitplaatsen:
+    - [0, 1.1, 1.1]
+    botsing: [1.2, 7.4, 1.6]
+    delen:
+    - "white_concrete -0.5 0.7 -3.5 0.5 1.4 2.2"
+    - "white_concrete -0.35 0.8 2.2 0.35 1.25 3.0"
+    - "gray_concrete -0.15 0.92 3.0 0.15 1.12 3.5"
+    - "light_blue_stained_glass -0.32 1.4 0.4 0.32 2.25 1.8"
+    - "white_concrete -2.6 0.95 -2.6 2.6 1.05 -1.2"
+    - "white_concrete -1.8 0.95 -1.2 1.8 1.05 -0.2"
+    - "white_concrete -1.1 0.95 -0.2 1.1 1.05 0.8"
+    - "red_concrete 2.6 0.95 -2.6 2.7 1.05 -1.9"
+    - "green_concrete -2.7 0.95 -2.6 -2.6 1.05 -1.9"
+    - "white_concrete 0.3 1.4 -3.5 0.38 2.4 -2.6 rz:-15"
+    - "white_concrete -0.38 1.4 -3.5 -0.3 2.4 -2.6 rz:15"
+    - "white_concrete -1.4 0.9 -3.6 1.4 0.98 -2.9"
+    - "gray_concrete -0.4 0.75 -3.9 0.4 1.35 -3.5"
+    - "shroomlight -0.25 0.85 -3.92 0.25 1.25 -3.88"
+    - "black_concrete 0.5 0.75 -0.5 0.75 1.2 1.0"
+    - "black_concrete -0.75 0.75 -0.5 -0.5 1.2 1.0"
+    - "black_concrete -0.07 0 2.0 0.07 0.4 2.35 draai:x"
+    - "gray_concrete -0.03 0.35 2.1 0.03 0.75 2.2"
+    - "black_concrete 0.6 0 -1.6 0.75 0.45 -1.15 draai:x"
+    - "black_concrete -0.75 0 -1.6 -0.6 0.45 -1.15 draai:x"
+    - "gray_concrete 0.62 0.4 -1.42 0.7 0.95 -1.35"
+    - "gray_concrete -0.7 0.4 -1.42 -0.62 0.95 -1.35"

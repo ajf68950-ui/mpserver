@@ -1,0 +1,111 @@
+# Ritly winkels. Elke winkel opent via een NPC (/ritly npc maak <winkel>), een Citizens-NPC
+# (/npc command add ritly winkel open <winkel> <p>) of een display in een showroom (/ritly showroom zet ...).
+# Spelers kunnen een winkel niet met een commando openen.
+#
+# producten:
+#   voertuig:<model>             een voertuig (uit modellen.yml), komt in de garage
+#   onderdeel:<motor|stuur|tank>:<1-3>   een onderdeel om in te bouwen (Garage > Werkplaats)
+#   lak:<kleur>                  lak (white, orange, magenta, light_blue, yellow, lime, pink, gray,
+#                                light_gray, cyan, purple, blue, brown, green, red, black)
+#   brandstof:<liter>            een jerrycan met brandstof
+# Na het aanpassen: /ritly herladen (of in het spel /ritly winkel ...)
+
+winkels:
+
+  fietsenwinkel:
+    titel: "&2&lFietsenwinkel"
+    producten:
+    - {product: "voertuig:stadsfiets", prijs: 1500}
+    - {product: "voertuig:mountainbike", prijs: 4000}
+    - {product: "onderdeel:motor:1", prijs: 2500}
+    - {product: "onderdeel:motor:2", prijs: 6000}
+    - {product: "onderdeel:stuur:1", prijs: 1000}
+    - {product: "onderdeel:stuur:2", prijs: 2500}
+    - {product: "lak:white", prijs: 250}
+    - {product: "lak:black", prijs: 250}
+    - {product: "lak:red", prijs: 250}
+    - {product: "lak:blue", prijs: 250}
+    - {product: "lak:light_blue", prijs: 250}
+    - {product: "lak:green", prijs: 250}
+    - {product: "lak:lime", prijs: 250}
+    - {product: "lak:yellow", prijs: 250}
+    - {product: "lak:orange", prijs: 250}
+    - {product: "lak:pink", prijs: 250}
+    - {product: "lak:purple", prijs: 250}
+
+  autodealer:
+    titel: "&8&lAutodealer"
+    producten:
+    - {product: "voertuig:gezinsauto", prijs: 25000}
+    - {product: "voertuig:sportwagen", prijs: 100000}
+    - {product: "onderdeel:motor:1", prijs: 10000}
+    - {product: "onderdeel:motor:2", prijs: 30000}
+    - {product: "onderdeel:motor:3", prijs: 75000}
+    - {product: "onderdeel:stuur:1", prijs: 5000}
+    - {product: "onderdeel:stuur:2", prijs: 12000}
+    - {product: "onderdeel:stuur:3", prijs: 25000}
+    - {product: "onderdeel:tank:1", prijs: 4000}
+    - {product: "onderdeel:tank:2", prijs: 10000}
+    - {product: "onderdeel:tank:3", prijs: 20000}
+    - {product: "brandstof:20", prijs: 250}
+    - {product: "lak:white", prijs: 1000}
+    - {product: "lak:black", prijs: 1000}
+    - {product: "lak:gray", prijs: 1000}
+    - {product: "lak:light_gray", prijs: 1000}
+    - {product: "lak:red", prijs: 1000}
+    - {product: "lak:blue", prijs: 1000}
+    - {product: "lak:light_blue", prijs: 1000}
+    - {product: "lak:green", prijs: 1000}
+    - {product: "lak:yellow", prijs: 1000}
+    - {product: "lak:orange", prijs: 1000}
+    - {product: "lak:purple", prijs: 1000}
+    - {product: "lak:pink", prijs: 1000}
+
+  jachthaven:
+    titel: "&1&lJachthaven"
+    producten:
+    - {product: "voertuig:jetski", prijs: 30000}
+    - {product: "voertuig:speedboot", prijs: 60000}
+    - {product: "onderdeel:motor:1", prijs: 10000}
+    - {product: "onderdeel:motor:2", prijs: 30000}
+    - {product: "onderdeel:motor:3", prijs: 75000}
+    - {product: "onderdeel:stuur:1", prijs: 5000}
+    - {product: "onderdeel:stuur:2", prijs: 12000}
+    - {product: "onderdeel:tank:1", prijs: 4000}
+    - {product: "onderdeel:tank:2", prijs: 10000}
+    - {product: "brandstof:20", prijs: 250}
+    - {product: "lak:white", prijs: 1000}
+    - {product: "lak:black", prijs: 1000}
+    - {product: "lak:red", prijs: 1000}
+    - {product: "lak:blue", prijs: 1000}
+    - {product: "lak:yellow", prijs: 1000}
+    - {product: "lak:orange", prijs: 1000}
+
+  luchthaven:
+    titel: "&3&lLuchthaven"
+    producten:
+    - {product: "voertuig:sportvliegtuig", prijs: 250000}
+    - {product: "voertuig:straaljager", prijs: 1000000}
+    - {product: "onderdeel:motor:1", prijs: 25000}
+    - {product: "onderdeel:motor:2", prijs: 75000}
+    - {product: "onderdeel:motor:3", prijs: 200000}
+    - {product: "onderdeel:stuur:1", prijs: 10000}
+    - {product: "onderdeel:stuur:2", prijs: 30000}
+    - {product: "onderdeel:stuur:3", prijs: 60000}
+    - {product: "onderdeel:tank:1", prijs: 10000}
+    - {product: "onderdeel:tank:2", prijs: 25000}
+    - {product: "onderdeel:tank:3", prijs: 50000}
+    - {product: "brandstof:50", prijs: 750}
+    - {product: "lak:white", prijs: 2500}
+    - {product: "lak:light_gray", prijs: 2500}
+    - {product: "lak:gray", prijs: 2500}
+    - {product: "lak:black", prijs: 2500}
+    - {product: "lak:red", prijs: 2500}
+    - {product: "lak:blue", prijs: 2500}
+    - {product: "lak:yellow", prijs: 2500}
+
+  tankstation:
+    titel: "&6&lTankstation"
+    producten:
+    - {product: "brandstof:20", prijs: 250}
+    - {product: "brandstof:50", prijs: 600}

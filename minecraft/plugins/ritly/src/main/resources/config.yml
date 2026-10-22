@@ -1,0 +1,105 @@
+# Ritly: voertuigen (fietsen, auto's, boten en vliegtuigen) kopen, samenstellen, bouwen en besturen.
+# Na het aanpassen: /ritly herladen
+#
+# Bestanden in deze map:
+#   modellen.yml   - de voertuigen (vorm uit blokken, snelheid, zitplaatsen)
+#   winkels.yml    - de winkels en wat ze verkopen, met prijzen
+#   voertuigen.yml - de voertuigen van de spelers (niet met de hand aanpassen terwijl de server draait)
+#   showrooms.yml  - de geplaatste displays
+#   gebouwd/       - modellen die in het spel uit blokken zijn gebouwd
+
+# Hier kun je voertuigen en onderdelen kopen (geld werkt alleen in deze werelden).
+# Lege lijst = overal.
+koop-werelden:
+- MPServer
+- MPServer_nether
+- MPServer_the_end
+- SuperiorWorld
+- SuperiorWorld_nether
+- SuperiorWorld_the_end
+- oneblock_world
+- oneblock_world_nether
+- oneblock_world_the_end
+
+# Hier kun je geen voertuig neerzetten of besturen.
+geblokkeerde-werelden:
+- gevangenis
+- parkour
+
+# Niet kopen of onderdelen inbouwen in creative of als toeschouwer (wat je in creative hebt, hoort niet in de economie).
+niet-in-creative: true
+
+# Hoeveel voertuigen een speler in zijn garage mag hebben, en hoeveel er tegelijk buiten mogen staan.
+# Een rang kan meer krijgen met het recht ritly.max.<aantal> (bijv. ritly.max.20).
+max-voertuigen: 10
+max-tegelijk: 2
+
+# Brandstof: auto's, boten en vliegtuigen hebben brandstof nodig (fietsen niet). false = altijd vol.
+brandstof: true
+
+# Sturen door te kijken: als je geen A/D indrukt, draait het voertuig rustig naar waar je kijkt.
+kijk-sturen: true
+
+# Toeter/bel met linksklikken tijdens het rijden.
+toeter: true
+
+# Uitstappen uit een vliegend vliegtuig: je krijgt een valscherm (Slow Falling).
+valscherm-seconden: 15
+
+# Een voertuig dat ergens geparkeerd staat en lang niet gebruikt is, gaat vanzelf terug naar de garage.
+# 0 = nooit.
+terug-naar-garage-na-dagen: 7
+
+# Onderdelen: wat elk niveau extra geeft (0.10 = 10% meer).
+upgrades:
+  motor: [0.10, 0.20, 0.35]   # snelheid en optrekken
+  stuur: [0.15, 0.30, 0.50]   # draaien
+  tank: [0.25, 0.50, 1.00]    # grotere tank
+
+# Welke onderdelen in welk soort voertuig passen.
+past-op:
+  fiets: [motor, stuur]
+  auto: [motor, stuur, tank]
+  boot: [motor, stuur, tank]
+  vliegtuig: [motor, stuur, tank]
+
+# Standaardwaarden voor voertuigen die in het spel uit blokken worden gebouwd.
+# max-snelheid in km/u, acceleratie in km/u per seconde, draaien in graden per seconde,
+# tank in liter, verbruik in liter per 1000 blokken, opstijgen = snelheid waarbij een vliegtuig loskomt.
+soorten:
+  fiets: {max-snelheid: 22, acceleratie: 15, draaien: 120, tank: 0, verbruik: 0}
+  auto: {max-snelheid: 65, acceleratie: 22, draaien: 90, tank: 40, verbruik: 8}
+  boot: {max-snelheid: 50, acceleratie: 18, draaien: 70, tank: 50, verbruik: 10}
+  vliegtuig: {max-snelheid: 110, acceleratie: 18, draaien: 45, tank: 100, verbruik: 12, opstijgen: 55}
+
+# Bouwen uit blokken: zet blokken neer, selecteer ze met de bouwstaf (linksklik = hoek 1, rechtsklik = hoek 2).
+# Een gouden drukplaat (light_weighted_pressure_plate) = de stoel van de bestuurder,
+# een ijzeren drukplaat (heavy_weighted_pressure_plate) = een stoel voor een passagier.
+# Witte blokken (white_concrete, white_wool, ...) krijgen de lakkleur van het voertuig.
+# De kant waar je naar kijkt bij het opslaan wordt de voorkant.
+bouwen:
+  # Spelers (/garage bouw): het voertuig komt in hun eigen garage en is alleen van hen.
+  speler-max-blokken: 120
+  speler-max-maat: 10
+  prijs-per-blok: 250
+  # Beheer (/ritly bouw): het model kan in winkels verkocht worden.
+  beheer-max-blokken: 800
+  beheer-max-maat: 32
+  # Aangrenzende blokken van hetzelfde soort samenvoegen tot een blok (minder entities, minder lag).
+  # Alleen voor blokken met een effen kleur, anders wordt de textuur uitgerekt.
+  samenvoegen:
+  - _concrete
+  - _wool
+  - _terracotta
+  - _stained_glass
+  - _concrete_powder
+  - glass
+
+showroom:
+  # Voertuigen in een showroom draaien langzaam rond.
+  draaien: true
+  graden-per-seconde: 15
+
+npc:
+  # NPC's van de winkels kijken naar spelers in de buurt.
+  kijken: true

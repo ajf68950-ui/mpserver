@@ -15,6 +15,7 @@ Eigen plugins voor de Meedia SMP-server (Paper 26.2, Java 25).
 | **Toolwise** | `minecraft/plugins/toolwise` | Pakt automatisch het beste gereedschap of wapen uit je hotbar (`/toolwise`) |
 | **Ordely** | `minecraft/plugins/ordely` | Regels: geld en items geven alleen via de website, niets uit creative verkopen (ook creative-blokken en -mobs leveren niets op). Gevangeniswereld met 32 cellen, opsluiten en vrijlaten (ook automatisch na waarschuwingen), logboek met reden, te gebruiken vanuit het beheer van de website (`/gevangenis`). Economie (1.1.0): verkopen alleen via de GUI (Opkoper en winkel) in Skyblock en OneBlock en alleen in survival, getypte verkoopcommando's werken voor niemand, geld werkt alleen in de survivalwereld, Skyblock en OneBlock, vangnet voor Essentials-verkopen en QuickShop-handel in creative. Poorten (1.2.0): `/poort` maakt van elk stuk muur (bijv. 3x3, 1 blok dik) een automatische poort die in een keer opengaat als er een speler dichtbij komt en weer dichtgaat als iedereen weg is; de blokken zijn beschermd tegen slopen, TNT en zuigers |
 | **Meldly** | `minecraft/plugins/meldly` | Minecraft en Discord, vervangt DiscordSRV: chat in twee richtingen, logs per categorie in eigen kanalen (chat, status, in- en uitloggen, doden, prestaties, commando's, moderatie, economie, fouten, koppelingen), live statusbericht, accounts koppelen met slash-commando's en een rol, voor meerdere Discord-servers tegelijk. Spraakgroepen zoals DiscordSRV: wie in het lobby-spraakkanaal zit, komt vanzelf in een tijdelijk spraakkanaal met spelers in de buurt, eilandgenoten (SuperiorSkyblock2/BentoBox) of zijn eigen team (`/discord team`). Instellen via Beheer > Discord op de website (`/discord`) |
+| **Ritly** | `minecraft/plugins/ritly` | Voertuigen: fietsen, auto's, boten en vliegtuigen kopen, samenstellen (motor, stuur, tank, lak), bijtanken en besturen (W/S/A/D, vliegen met kijken). Gemaakt van block displays, zonder resourcepack. Winkels (`winkels.yml`) met eigen NPC's of Citizens, showroom-displays waar je op klikt om te kopen, en zelf voertuigen bouwen uit blokken met de bouwstaf (`/garage`, `/ritly`) |
 
 ### Downloaden
 
@@ -25,7 +26,7 @@ De kant-en-klare jars staan in [`minecraft/plugins/releases`](minecraft/plugins/
 ### Zelf bouwen
 
 ```
-cd minecraft/plugins/vaulty      (of statusbord, pocketly, toolwise, muntly, ordely, meldly)
+cd minecraft/plugins/vaulty      (of statusbord, pocketly, toolwise, muntly, ordely, meldly, ritly)
 mvn package
 ```
 
