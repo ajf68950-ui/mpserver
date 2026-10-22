@@ -115,7 +115,27 @@ final class Economie implements Listener, CommandExecutor {
         if (!isGeldWereld(p.getWorld()) && isGeldCommando(namen, args)) {
             e.setCancelled(true);
             Ordely.regel(p, "Geld werkt niet in deze wereld. Dat kan alleen in " + geldTekst + ".");
+            return;
         }
+        // 3. Jezelf betalen heeft geen zin (Essentials staat het toe en meldt dan "verstuurd" en "ontvangen")
+        if (namen.contains("pay") && args.length > 0 && betaaltZichzelf(p, args[0])) {
+            e.setCancelled(true);
+            Ordely.regel(p, "Je kunt jezelf geen geld betalen.");
+        }
+    }
+
+    /** Staat de speler zelf tussen de ontvangers? Ook bij een deel van de naam, @s of * (iedereen). */
+    private static boolean betaaltZichzelf(Player p, String doel) {
+        for (String d : doel.split(",")) {
+            d = d.trim();
+            if (d.isEmpty()) continue;
+            if (d.equalsIgnoreCase(p.getName()) || d.equalsIgnoreCase("@s") || d.equals("*") || d.equals("**") || d.startsWith("@a") || d.startsWith("@p")) return true;
+            Player gevonden = Bukkit.getPlayer(d); // Bukkit zoekt ook op het begin van de naam, net als Essentials
+            if (gevonden != null && gevonden.getUniqueId().equals(p.getUniqueId())) return true;
+            String bijnaam = net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(p.displayName());
+            if (bijnaam.replaceFirst("^~", "").equalsIgnoreCase(d)) return true;
+        }
+        return false;
     }
 
     private boolean isGeldCommando(Set<String> namen, String[] args) {
