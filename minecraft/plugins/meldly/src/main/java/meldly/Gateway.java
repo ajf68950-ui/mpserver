@@ -22,8 +22,8 @@ import java.util.logging.Logger;
  * Doet heartbeats, identify, resume na een onderbreking en opnieuw verbinden met wachttijd.
  */
 final class Gateway implements WebSocket.Listener {
-    /** GUILDS, GUILD_MESSAGES, MESSAGE_CONTENT */
-    static final int INTENTS = 1 | (1 << 9) | (1 << 15);
+    /** GUILDS, GUILD_VOICE_STATES, GUILD_MESSAGES, MESSAGE_CONTENT */
+    static final int INTENTS = 1 | (1 << 7) | (1 << 9) | (1 << 15);
 
     private final Logger log;
     private final HttpClient http;

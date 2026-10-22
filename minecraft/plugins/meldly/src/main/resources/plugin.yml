@@ -3,11 +3,11 @@ version: '${project.version}'
 main: meldly.Meldly
 api-version: '26.2'
 description: Minecraft en Discord - chat in twee richtingen, logs per categorie in eigen kanalen, live status en accounts koppelen, voor meerdere Discord-servers tegelijk. Vervangt DiscordSRV.
-softdepend: [DiscordSRV, LuckPerms, SuperVanish, Ordely, Muntly]
+softdepend: [DiscordSRV, LuckPerms, SuperVanish, Ordely, Muntly, SuperiorSkyblock2, BentoBox]
 commands:
   discord:
     description: Je Minecraft-account aan Discord koppelen.
-    usage: /discord [koppel [code] | ontkoppel | status | herladen]
+    usage: /discord [koppel [code] | ontkoppel | team | status | herladen]
     aliases: [meldly]
 permissions:
   meldly.use:

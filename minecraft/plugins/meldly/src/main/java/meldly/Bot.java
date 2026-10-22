@@ -37,7 +37,7 @@ final class Bot {
             PERM_HISTORY = 1L << 16, PERM_CHANNELS = 1L << 4, PERM_MANAGE_MSG = 1L << 13, PERM_ROLES = 1L << 28,
             PERM_WEBHOOKS = 1L << 29, PERM_NICKS = 1L << 27;
     static final long UITNODIG_RECHTEN = PERM_VIEW | PERM_SEND | PERM_EMBED | PERM_FILES | PERM_HISTORY | PERM_CHANNELS
-            | PERM_MANAGE_MSG | PERM_ROLES | PERM_WEBHOOKS | PERM_NICKS;
+            | PERM_MANAGE_MSG | PERM_ROLES | PERM_WEBHOOKS | PERM_NICKS | (1L << 20) | (1L << 24);
 
     record Kanaal(String id, String naam, int type, String parent, int positie) {}
     record Rol(String id, String naam, int positie, boolean beheerd, int kleur) {}
@@ -60,6 +60,8 @@ final class Bot {
     final Opslag opslag;
     final Koppelingen kop;
     final Map<String, Guild> guilds = new ConcurrentHashMap<>();
+    /** Wie zit in welk spraakkanaal: guild -> (Discord-gebruiker -> kanaal). */
+    final Map<String, Map<String, String>> spraak = new ConcurrentHashMap<>();
     private final Deque<Fout> fouten = new ArrayDeque<>();
     private final Map<String, Long> laatsteFoutTekst = new ConcurrentHashMap<>();
 
@@ -223,6 +225,7 @@ final class Bot {
                 String id = str(d, "id");
                 boolean storing = d.has("unavailable") && d.get("unavailable").getAsBoolean();
                 Guild g = guilds.remove(id);
+                spraak.remove(id);
                 if (!storing && g != null) plugin.getLogger().info("De bot is uit Discord-server " + g.naam + " gehaald.");
             }
             case "CHANNEL_CREATE", "CHANNEL_UPDATE" -> {
@@ -242,6 +245,12 @@ final class Bot {
                 if (gi != null && rid.equals(gi.koppelRol)) { gi.koppelRol = ""; opslag.bewaar(); }
             }
             case "MESSAGE_CREATE" -> berichtBinnen(d);
+            case "VOICE_STATE_UPDATE" -> {
+                String gid = str(d, "guild_id"), uid = str(d, "user_id"), kid = strOfNull(d, "channel_id");
+                if (gid.isEmpty() || uid.isEmpty()) return;
+                Map<String, String> m = spraak.computeIfAbsent(gid, k -> new ConcurrentHashMap<>());
+                if (kid == null) m.remove(uid); else m.put(uid, kid);
+            }
             case "INTERACTION_CREATE" -> interactie(d);
             default -> { }
         }
@@ -273,6 +282,13 @@ final class Bot {
         g.leden = d.has("member_count") ? d.get("member_count").getAsInt() : 0;
         if (d.has("channels")) for (JsonElement e : d.getAsJsonArray("channels")) { Kanaal k = kanaal(e.getAsJsonObject()); g.kanalen.put(k.id(), k); }
         if (d.has("roles")) for (JsonElement e : d.getAsJsonArray("roles")) { Rol r = rol(e.getAsJsonObject()); g.rollen.put(r.id(), r); }
+        Map<String, String> stemmen = new ConcurrentHashMap<>();
+        if (d.has("voice_states")) for (JsonElement e : d.getAsJsonArray("voice_states")) {
+            JsonObject v = e.getAsJsonObject();
+            String kid = strOfNull(v, "channel_id");
+            if (kid != null) stemmen.put(str(v, "user_id"), kid);
+        }
+        spraak.put(g.id, stemmen);
         guilds.put(g.id, g);
         boolean nieuw = opslag.bestaand(g.id) == null;
         Opslag.GuildInst gi = opslag.guild(g.id);
@@ -286,8 +302,19 @@ final class Bot {
             plugin.saveConfig();
             plugin.getLogger().info("Chatkanaal van DiscordSRV overgenomen in " + g.naam + ".");
         }
+        // lobby-spraakkanaal van DiscordSRV: groepen aan zoals ze waren
+        String dsrvLobby = plugin.getConfig().getString("import.discordsrv-lobby", "");
+        if (!dsrvLobby.isEmpty() && g.kanalen.containsKey(dsrvLobby) && gi.lobby.isEmpty()) {
+            gi.lobby = dsrvLobby;
+            gi.groepenAan = plugin.getConfig().getBoolean("import.discordsrv-spraak-aan", true);
+            gi.groepZichtbaar = plugin.getConfig().getBoolean("import.discordsrv-spraak-zichtbaar", true);
+            plugin.getConfig().set("import.discordsrv-lobby", "");
+            plugin.saveConfig();
+            plugin.getLogger().info("Spraak-lobby van DiscordSRV overgenomen in " + g.naam + ".");
+        }
         // kanalen die verwijderd zijn terwijl de server uit stond
         boolean gewijzigd = false;
+        if (!gi.lobby.isEmpty() && !g.kanalen.containsKey(gi.lobby)) { gi.lobby = ""; gi.groepenAan = false; gewijzigd = true; }
         for (Categorie c : Categorie.values()) {
             Opslag.CatInst ci = gi.cat(c);
             if (!ci.kanaal.isEmpty() && !g.kanalen.containsKey(ci.kanaal)) {
@@ -320,6 +347,11 @@ final class Bot {
         }
         if (kid.equals(gi.categorieKanaal)) { gi.categorieKanaal = ""; gewijzigd = true; }
         if (kid.equals(gi.cat(Categorie.STATUS).kanaal)) gi.statusBericht = "";
+        if (kid.equals(gi.lobby)) {
+            gi.lobby = ""; gi.groepenAan = false; gewijzigd = true;
+            plugin.getLogger().info("Het lobby-spraakkanaal in " + gi.naam + " is verwijderd; spraakgroepen staan daar nu uit.");
+        }
+        if (gi.groepKanalen.remove(kid) != null) gewijzigd = true;
         if (gewijzigd) { opslag.bewaar(); commandosBijwerken(gid); }
     }
 
@@ -414,6 +446,53 @@ final class Bot {
             opslag.bewaar();
             commandosBijwerken(gid);
             if (c == Categorie.STATUS) plugin.status().nu();
+        });
+    }
+
+    // ------------------------------------------------------------ spraakgroepen
+    /** Spraakgroepen aan/uit. lobbyKeuze: "nieuw" = categorie + lobby maken, anders het id van een bestaand spraakkanaal ("" = huidige houden). */
+    CompletableFuture<Void> zetGroepen(String gid, boolean aan, String lobbyKeuze, boolean buurt, boolean eiland, boolean team, boolean zichtbaar) {
+        Guild g = guilds.get(gid);
+        Rest r = rest;
+        if (g == null || r == null) return CompletableFuture.failedFuture(new IllegalStateException("De bot zit niet (meer) in deze Discord-server of is niet verbonden."));
+        Opslag.GuildInst gi = opslag.guild(gid);
+        gi.groepBuurt = buurt; gi.groepEiland = eiland; gi.groepTeam = team; gi.groepZichtbaar = zichtbaar;
+        if (!aan) {
+            gi.groepenAan = false;
+            opslag.bewaar();
+            commandosBijwerken(gid);
+            return CompletableFuture.completedFuture(null);
+        }
+        CompletableFuture<String> lobby;
+        if (lobbyKeuze != null && !lobbyKeuze.isBlank() && !lobbyKeuze.equals("nieuw")) {
+            Kanaal k = g.kanalen.get(lobbyKeuze);
+            if (k == null || k.type() != 2) return CompletableFuture.failedFuture(new IllegalArgumentException("Kies een spraakkanaal als lobby."));
+            lobby = CompletableFuture.completedFuture(lobbyKeuze);
+        } else if (!"nieuw".equals(lobbyKeuze) && !gi.lobby.isEmpty() && g.kanalen.containsKey(gi.lobby)) {
+            lobby = CompletableFuture.completedFuture(gi.lobby);
+        } else {
+            String catNaam = plugin.getConfig().getString("groepen.namen.categorie", "MPServer spraak");
+            CompletableFuture<String> cat = null;
+            for (Kanaal k : g.kanalen.values()) if (k.type() == 4 && k.naam().equalsIgnoreCase(catNaam)) { cat = CompletableFuture.completedFuture(k.id()); break; }
+            if (cat == null) {
+                JsonObject cb = new JsonObject();
+                cb.addProperty("name", catNaam);
+                cb.addProperty("type", 4);
+                cat = r.post("/guilds/" + gid + "/channels", cb).thenApply(j -> { Kanaal k = kanaal(j.getAsJsonObject()); g.kanalen.put(k.id(), k); return k.id(); });
+            }
+            lobby = cat.thenCompose(parent -> {
+                JsonObject lb = new JsonObject();
+                lb.addProperty("name", plugin.getConfig().getString("groepen.namen.lobby", "\uD83C\uDF99\uFE0F Minecraft lobby"));
+                lb.addProperty("type", 2);
+                lb.addProperty("parent_id", parent);
+                return r.post("/guilds/" + gid + "/channels", lb);
+            }).thenApply(j -> { Kanaal k = kanaal(j.getAsJsonObject()); g.kanalen.put(k.id(), k); return k.id(); });
+        }
+        return lobby.thenAccept(id -> {
+            gi.lobby = id;
+            gi.groepenAan = true;
+            opslag.bewaar();
+            commandosBijwerken(gid);
         });
     }
 

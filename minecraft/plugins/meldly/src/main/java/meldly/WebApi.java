@@ -16,6 +16,7 @@ import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -91,6 +92,8 @@ final class WebApi {
                     case "/admin/vergeet" -> { plugin.opslag().verwijder(str(b, "guild")); yield ok("Vergeten."); }
                     case "/admin/ontkoppel" -> ontkoppel(b);
                     case "/admin/instellingen" -> instellingen(b);
+                    case "/admin/groepen" -> groepen(b);
+                    case "/admin/team-opheffen" -> plugin.teams().hefOp(str(b, "naam")) ? ok("Team opgeheven.") : fout("Dat team bestaat niet (meer).");
                     default -> null;
                 };
                 if (r == null) { send(ex, 404, fout("Deze functie kent Meldly nog niet. Herstart de server zodat de nieuwste Meldly geladen wordt.")); return; }
@@ -190,6 +193,14 @@ final class WebApi {
         return wacht(f, aan ? "Koppelen staat aan." : "Koppelen staat uit.");
     }
 
+    private JsonObject groepen(JsonObject b) {
+        String gid = str(b, "guild");
+        if (gid.isEmpty()) return fout("Onbekende server.");
+        boolean aan = bool(b, "aan");
+        return wacht(plugin.bot().zetGroepen(gid, aan, str(b, "lobby"), bool(b, "buurt"), bool(b, "eiland"), bool(b, "team"), bool(b, "zichtbaar")),
+                aan ? "Spraakgroepen staan aan." : "Spraakgroepen staan uit.");
+    }
+
     private JsonObject ontkoppel(JsonObject b) {
         UUID u;
         try { u = UUID.fromString(str(b, "uuid")); } catch (Exception e) { return fout("Ongeldige speler."); }
@@ -206,6 +217,11 @@ final class WebApi {
                 if (b.has("adres")) c.set("status.adres", str(b, "adres"));
                 if (b.has("servernaam")) c.set("status.servernaam", str(b, "servernaam"));
                 if (b.has("uitnodiging")) c.set("algemeen.uitnodiging", str(b, "uitnodiging"));
+                if (b.has("afstand")) {
+                    int af = 80;
+                    try { af = Integer.parseInt(str(b, "afstand")); } catch (NumberFormatException ignored) { }
+                    c.set("groepen.afstand.horizontaal", Math.max(5, Math.min(500, af)));
+                }
                 plugin.saveConfig();
                 return null;
             }).get(8, TimeUnit.SECONDS);
@@ -238,6 +254,7 @@ final class WebApi {
         inst.addProperty("adres", c.getString("status.adres", ""));
         inst.addProperty("servernaam", c.getString("status.servernaam", ""));
         inst.addProperty("uitnodiging", c.getString("algemeen.uitnodiging", ""));
+        inst.addProperty("afstand", c.getInt("groepen.afstand.horizontaal", 80));
         o.add("instellingen", inst);
 
         JsonArray cats = new JsonArray();
@@ -301,6 +318,41 @@ final class WebApi {
             }
             s.add("kanalen", kanalen);
             s.add("rollen", rollen);
+            JsonArray spraakKanalen = new JsonArray();
+            if (g != null) {
+                g.kanalen.values().stream().filter(k -> k.type() == 2 && !gi.groepKanalen.containsKey(k.id()))
+                        .sorted(Comparator.comparing((Bot.Kanaal k) -> parentPos(g, k)).thenComparingInt(Bot.Kanaal::positie))
+                        .forEach(k -> {
+                            JsonObject j = new JsonObject();
+                            j.addProperty("id", k.id());
+                            j.addProperty("naam", k.naam());
+                            Bot.Kanaal p = k.parent() == null ? null : g.kanalen.get(k.parent());
+                            j.addProperty("groep", p == null ? "" : p.naam());
+                            spraakKanalen.add(j);
+                        });
+            }
+            s.add("spraakKanalen", spraakKanalen);
+            JsonObject gr = new JsonObject();
+            gr.addProperty("aan", gi.groepenAan);
+            gr.addProperty("lobby", gi.lobby);
+            Bot.Kanaal lk = g == null ? null : g.kanalen.get(gi.lobby);
+            gr.addProperty("lobbyNaam", lk == null ? "" : lk.naam());
+            gr.addProperty("buurt", gi.groepBuurt);
+            gr.addProperty("eiland", gi.groepEiland);
+            gr.addProperty("team", gi.groepTeam);
+            gr.addProperty("zichtbaar", gi.groepZichtbaar);
+            Map<String, String> stemmen = bot.spraak.getOrDefault(id, Map.of());
+            JsonArray actief = new JsonArray();
+            for (Map.Entry<String, String> e : gi.groepKanalen.entrySet()) {
+                Bot.Kanaal k = g == null ? null : g.kanalen.get(e.getKey());
+                JsonObject j = new JsonObject();
+                j.addProperty("naam", k == null ? e.getValue() : k.naam());
+                j.addProperty("leden", stemmen.values().stream().filter(x -> x.equals(e.getKey())).count());
+                actief.add(j);
+            }
+            gr.add("actief", actief);
+            gr.addProperty("inLobby", gi.lobby.isEmpty() ? 0 : stemmen.values().stream().filter(x -> x.equals(gi.lobby)).count());
+            s.add("groepen", gr);
             JsonObject kp = new JsonObject();
             kp.addProperty("aan", gi.koppelAan);
             kp.addProperty("rol", gi.koppelRol);
@@ -321,6 +373,18 @@ final class WebApi {
             kop.add(j);
         }
         o.add("koppelingen", kop);
+
+        JsonArray teams = new JsonArray();
+        for (Teams.Team t : plugin.teams().alle()) {
+            JsonObject j = new JsonObject();
+            j.addProperty("naam", t.naam);
+            j.addProperty("eigenaar", Bot.spelerNaam(t.eigenaar));
+            JsonArray leden = new JsonArray();
+            for (UUID u : t.leden) leden.add(Bot.spelerNaam(u));
+            j.add("leden", leden);
+            teams.add(j);
+        }
+        o.add("teams", teams);
 
         JsonArray fouten = new JsonArray();
         for (Bot.Fout f : bot.fouten()) {

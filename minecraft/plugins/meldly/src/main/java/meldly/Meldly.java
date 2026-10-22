@@ -39,6 +39,9 @@ public final class Meldly extends JavaPlugin implements TabCompleter {
     private Status status;
     private LogVolger logs;
     private WebApi web;
+    private Teams teams;
+    private Spraak spraak;
+    private final Eilanden eilanden = new Eilanden();
     private volatile Snapshot snap = new Snapshot(List.of(), 0, 20.0, "");
     private long gestart;
     private long laatsteTpsAlarm = 0;
@@ -51,6 +54,7 @@ public final class Meldly extends JavaPlugin implements TabCompleter {
     long gestart() { return gestart; }
     Snapshot snapshot() { return snap; }
     Koppelingen koppelingen() { return kop; }
+    Teams teams() { return teams; }
 
     @Override
     public void onEnable() {
@@ -67,12 +71,16 @@ public final class Meldly extends JavaPlugin implements TabCompleter {
         opslag.laad();
         kop = new Koppelingen(getDataFolder(), getLogger());
         kop.laad();
+        teams = new Teams(getDataFolder(), getLogger());
+        teams.laad();
         importeerDiscordSrv();
+        importeerDiscordSrvSpraak();
         schakelDiscordSrvUit();
 
         bot = new Bot(this, opslag, kop);
         uitvoer = new Uitvoer(this, bot);
         status = new Status(this, bot);
+        spraak = new Spraak(this, bot);
         logs = new LogVolger(this);
         logs.laad(false);
 
@@ -99,6 +107,8 @@ public final class Meldly extends JavaPlugin implements TabCompleter {
         long statusElke = Math.max(30L, getConfig().getLong("status.elke-seconden", 60)) * 20L;
         s.runTaskTimerAsynchronously(this, () -> { if (bot.verbonden()) status.werkBij(snap, true); }, 200L, statusElke);
         s.runTaskTimer(this, this::controleerTps, 1200L, 600L);
+        long groepElke = Math.max(10L, getConfig().getLong("groepen.elke-ticks", 20));
+        s.runTaskTimer(this, this::spraakTik, 100L, groepElke);
         getLogger().info("Meldly " + getPluginMeta().getVersion() + " gestart. Instellen: website > Beheer > Discord.");
     }
 
@@ -130,6 +140,7 @@ public final class Meldly extends JavaPlugin implements TabCompleter {
         reloadConfig();
         opslag.laad();
         kop.laad();
+        teams.laad();
         logs.laad(serverIsKlaar);
         bot.start();
     }
@@ -162,6 +173,22 @@ public final class Meldly extends JavaPlugin implements TabCompleter {
             uitvoer.meld(Categorie.FOUTEN, new Uitvoer.Regel("🐢 **TPS laag:** " + String.format(Locale.ROOT, "%.1f", tps)
                     + " (grens " + grens + ") met " + Bukkit.getOnlinePlayers().size() + " spelers online"));
         }
+    }
+
+    /** Momentopname voor de spraakgroepen (hoofdthread), daarna verder op de achtergrond. */
+    private void spraakTik() {
+        if (!bot.verbonden() || !spraak.ergensAan()) return;
+        List<Spraak.Speler> lijst = new ArrayList<>();
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            Koppelingen.Koppeling k = kop.vanSpeler(p.getUniqueId());
+            if (k == null || onzichtbaar(p)) continue;
+            Teams.Team t = teams.teamVan(p.getUniqueId());
+            Eilanden.Eiland e = eilanden.van(p);
+            var l = p.getLocation();
+            lijst.add(new Spraak.Speler(p.getUniqueId(), p.getName(), k.discordId, p.getWorld().getName(), l.getX(), l.getY(), l.getZ(),
+                    t == null ? null : t.naam, e == null ? null : e.sleutel(), e == null ? null : e.naam()));
+        }
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> spraak.tik(lijst));
     }
 
     String hoofd(String naam, UUID u) {
@@ -220,6 +247,35 @@ public final class Meldly extends JavaPlugin implements TabCompleter {
         }
     }
 
+    /** Eenmalig: het lobby-spraakkanaal en de afstanden uit DiscordSRV/voice.yml overnemen. */
+    private void importeerDiscordSrvSpraak() {
+        if (getConfig().getBoolean("import.discordsrv-spraak-gedaan", false)) return;
+        File f = new File(new File(getDataFolder().getParentFile(), "DiscordSRV"), "voice.yml");
+        if (!f.exists()) return;
+        try {
+            String t = Files.readString(f.toPath(), StandardCharsets.UTF_8);
+            Matcher aan = Pattern.compile("(?m)^Voice enabled:\\s*(true|false)").matcher(t);
+            Matcher lobby = Pattern.compile("(?m)^Lobby channel:\\s*\"?(\\d{15,21})").matcher(t);
+            if (lobby.find()) {
+                getConfig().set("import.discordsrv-lobby", lobby.group(1));
+                getConfig().set("import.discordsrv-spraak-aan", !aan.find() || aan.group(1).equals("true"));
+            }
+            Matcher zicht = Pattern.compile("(?m)^\\s*Channels are visible:\\s*(true|false)").matcher(t);
+            if (zicht.find()) getConfig().set("import.discordsrv-spraak-zichtbaar", zicht.group(1).equals("true"));
+            Matcher h = Pattern.compile("(?m)^\\s*Horizontal Strength:\\s*(\\d+)").matcher(t);
+            Matcher v = Pattern.compile("(?m)^\\s*Vertical Strength:\\s*(\\d+)").matcher(t);
+            Matcher fo = Pattern.compile("(?m)^\\s*Falloff:\\s*(\\d+)").matcher(t);
+            if (h.find()) getConfig().set("groepen.afstand.horizontaal", Integer.parseInt(h.group(1)));
+            if (v.find()) getConfig().set("groepen.afstand.verticaal", Integer.parseInt(v.group(1)));
+            if (fo.find()) getConfig().set("groepen.afstand.speling", Integer.parseInt(fo.group(1)));
+            getConfig().set("import.discordsrv-spraak-gedaan", true);
+            saveConfig();
+            getLogger().info("Spraakinstellingen van DiscordSRV overgenomen.");
+        } catch (Exception e) {
+            getLogger().warning("Kon de spraakinstellingen van DiscordSRV niet overnemen: " + e.getMessage());
+        }
+    }
+
     boolean discordSrvAanwezig() { return getServer().getPluginManager().getPlugin("DiscordSRV") != null; }
 
     private void schakelDiscordSrvUit() {
@@ -263,6 +319,11 @@ public final class Meldly extends JavaPlugin implements TabCompleter {
                 p.sendMessage(kop(k == null ? "Je account is niet gekoppeld aan Discord." : "De koppeling met Discord is weggehaald."));
                 return true;
             }
+            case "team", "party" -> {
+                if (!(s instanceof Player p)) { s.sendMessage("Alleen in het spel."); return true; }
+                team(p, a);
+                return true;
+            }
             case "herladen", "reload" -> {
                 if (!s.hasPermission("meldly.admin")) { s.sendMessage(kop("Daar heb je geen rechten voor.").color(NamedTextColor.RED)); return true; }
                 herlaad();
@@ -294,10 +355,99 @@ public final class Meldly extends JavaPlugin implements TabCompleter {
         }
     }
 
+    private void team(Player p, String[] a) {
+        String sub = a.length < 2 ? "" : a[1].toLowerCase(Locale.ROOT);
+        int max = getConfig().getInt("groepen.max-teamleden", 10);
+        switch (sub) {
+            case "maak", "create" -> {
+                if (a.length < 3) { p.sendMessage(kop("Gebruik: /discord team maak <naam>")); return; }
+                String f = teams.maak(p.getUniqueId(), a[2]);
+                p.sendMessage(f != null ? kop(f).color(NamedTextColor.RED)
+                        : kop("Team " + a[2] + " gemaakt. Nodig spelers uit met /discord team uitnodigen <speler>.").color(NamedTextColor.GREEN));
+            }
+            case "uitnodigen", "invite" -> {
+                if (a.length < 3) { p.sendMessage(kop("Gebruik: /discord team uitnodigen <speler>")); return; }
+                Player wie = Bukkit.getPlayerExact(a[2]);
+                if (wie == null) { p.sendMessage(kop("Die speler is niet online.").color(NamedTextColor.RED)); return; }
+                if (wie.equals(p)) { p.sendMessage(kop("Jezelf uitnodigen hoeft niet.").color(NamedTextColor.RED)); return; }
+                String f = teams.nodigUit(p.getUniqueId(), wie.getUniqueId(), max);
+                if (f != null) { p.sendMessage(kop(f).color(NamedTextColor.RED)); return; }
+                Teams.Team t = teams.teamVan(p.getUniqueId());
+                p.sendMessage(kop(wie.getName() + " is uitgenodigd voor team " + t.naam + ".").color(NamedTextColor.GREEN));
+                wie.sendMessage(kop(p.getName() + " nodigt je uit voor team " + t.naam + ". ")
+                        .append(Component.text("[Accepteren]", NamedTextColor.GREEN).clickEvent(ClickEvent.runCommand("/discord team accepteer"))
+                                .hoverEvent(HoverEvent.showText(Component.text("Klik om in het team te gaan"))))
+                        .append(Component.text(" "))
+                        .append(Component.text("[Weigeren]", NamedTextColor.RED).clickEvent(ClickEvent.runCommand("/discord team weiger"))));
+            }
+            case "accepteer", "accept", "ja" -> {
+                Teams.Uitnodiging u = teams.uitnodiging(p.getUniqueId());
+                String naam = teams.accepteer(p.getUniqueId(), max);
+                if (naam == null) { p.sendMessage(kop("Je hebt geen (geldige) uitnodiging.").color(NamedTextColor.RED)); return; }
+                Teams.Team t = teams.team(naam);
+                for (UUID l : t.leden) {
+                    Player q = Bukkit.getPlayer(l);
+                    if (q != null) q.sendMessage(kop(p.getName() + " zit nu in team " + naam + ".").color(NamedTextColor.GREEN));
+                }
+                if (u != null) getLogger().info(p.getName() + " zit nu in team " + naam + ".");
+            }
+            case "weiger", "deny", "nee" -> {
+                teams.weiger(p.getUniqueId());
+                p.sendMessage(kop("Uitnodiging geweigerd."));
+            }
+            case "verlaat", "leave" -> {
+                Teams.Team t = teams.verlaat(p.getUniqueId());
+                if (t == null) { p.sendMessage(kop("Je zit niet in een team.")); return; }
+                p.sendMessage(kop("Je hebt team " + t.naam + " verlaten."));
+                for (UUID l : t.leden) {
+                    Player q = Bukkit.getPlayer(l);
+                    if (q != null) q.sendMessage(kop(p.getName() + " heeft het team verlaten." + (t.eigenaar.equals(l) ? " Jij bent nu de eigenaar." : "")));
+                }
+            }
+            case "verwijder", "opheffen", "disband" -> {
+                Teams.Team t = teams.teamVan(p.getUniqueId());
+                if (t == null) { p.sendMessage(kop("Je zit niet in een team.")); return; }
+                if (!t.eigenaar.equals(p.getUniqueId()) && !p.hasPermission("meldly.admin")) { p.sendMessage(kop("Alleen de eigenaar kan het team opheffen.").color(NamedTextColor.RED)); return; }
+                List<UUID> leden = new ArrayList<>(t.leden);
+                teams.hefOp(t.naam);
+                for (UUID l : leden) {
+                    Player q = Bukkit.getPlayer(l);
+                    if (q != null) q.sendMessage(kop("Team " + t.naam + " is opgeheven."));
+                }
+            }
+            case "eruit", "kick" -> {
+                Teams.Team t = teams.teamVan(p.getUniqueId());
+                if (t == null || !t.eigenaar.equals(p.getUniqueId())) { p.sendMessage(kop("Alleen de eigenaar van een team kan iemand eruit zetten.").color(NamedTextColor.RED)); return; }
+                if (a.length < 3) { p.sendMessage(kop("Gebruik: /discord team eruit <speler>")); return; }
+                UUID wie = null;
+                for (UUID l : t.leden) if (a[2].equalsIgnoreCase(Bot.spelerNaam(l))) wie = l;
+                if (wie == null || wie.equals(p.getUniqueId())) { p.sendMessage(kop("Die speler zit niet in je team.").color(NamedTextColor.RED)); return; }
+                teams.verlaat(wie);
+                p.sendMessage(kop(a[2] + " zit niet meer in je team."));
+                Player q = Bukkit.getPlayer(wie);
+                if (q != null) q.sendMessage(kop("Je bent uit team " + t.naam + " gezet."));
+            }
+            default -> {
+                Teams.Team t = teams.teamVan(p.getUniqueId());
+                if (t != null) {
+                    List<String> namen = new ArrayList<>();
+                    for (UUID l : t.leden) namen.add(Bot.spelerNaam(l) + (l.equals(t.eigenaar) ? " (eigenaar)" : ""));
+                    p.sendMessage(kop("Team " + t.naam + ": " + String.join(", ", namen)));
+                } else p.sendMessage(kop("Je zit niet in een team."));
+                p.sendMessage(Component.text(" /discord team maak <naam> | uitnodigen <speler> | accepteer | verlaat | eruit <speler> | opheffen", NamedTextColor.DARK_GRAY));
+                p.sendMessage(Component.text(" Wie in hetzelfde team zit, praat in Discord samen (ga in het lobby-spraakkanaal zitten).", NamedTextColor.DARK_GRAY));
+            }
+        }
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender s, Command c, String label, String[] a) {
+        if (a.length == 2 && a[0].equalsIgnoreCase("team"))
+            return List.of("maak", "uitnodigen", "accepteer", "weiger", "verlaat", "eruit", "opheffen").stream().filter(o -> o.startsWith(a[1].toLowerCase(Locale.ROOT))).toList();
+        if (a.length == 3 && a[0].equalsIgnoreCase("team") && (a[1].equalsIgnoreCase("uitnodigen") || a[1].equalsIgnoreCase("eruit")))
+            return Bukkit.getOnlinePlayers().stream().map(Player::getName).filter(n -> n.toLowerCase(Locale.ROOT).startsWith(a[2].toLowerCase(Locale.ROOT))).toList();
         if (a.length != 1) return List.of();
-        List<String> opties = new ArrayList<>(List.of("koppel", "ontkoppel"));
+        List<String> opties = new ArrayList<>(List.of("koppel", "ontkoppel", "team"));
         if (s.hasPermission("meldly.admin")) { opties.add("status"); opties.add("herladen"); }
         return opties.stream().filter(o -> o.startsWith(a[0].toLowerCase(Locale.ROOT))).toList();
     }

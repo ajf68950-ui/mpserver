@@ -128,6 +128,27 @@ logbestanden:
     soort: tekst
     categorie: economie
 
+groepen:
+  # Spraakgroepen in Discord (zoals bij DiscordSRV): wie gekoppeld is en in het lobby-spraakkanaal zit,
+  # komt vanzelf in een tijdelijk spraakkanaal met zijn team, eilandgenoten of spelers in de buurt.
+  # Aan/uit en de lobby kies je per Discord-server in Beheer > Discord.
+  afstand:
+    # Binnen hoeveel blokken spelers bij elkaar horen (naast elkaar en boven/onder elkaar).
+    horizontaal: 80
+    verticaal: 40
+    # Wie al samen praat, mag zoveel blokken verder uit elkaar voordat de groep uit elkaar gaat.
+    speling: 5
+  max-teamleden: 10
+  # Melding in het spel als je in een andere groep komt.
+  meldingen: true
+  elke-ticks: 20
+  namen:
+    categorie: 'MPServer spraak'
+    lobby: '🎙️ Minecraft lobby'
+    in-de-buurt: '🔊 In de buurt {nr}'
+    team: '👥 Team {naam}'
+    eiland: '🏝️ {naam}'
+
 koppelen:
   # Naam van de rol die de bot maakt als je in het beheer "Nieuwe rol maken" kiest.
   rol-naam: 'Minecraft'
@@ -142,3 +163,5 @@ import:
   discordsrv-chatkanaal: ''
   # DiscordSRV uitschakelen als het nog in de map plugins staat (anders zou alles dubbel komen).
   discordsrv-uitschakelen: true
+  discordsrv-spraak-gedaan: false
+  discordsrv-lobby: ''

@@ -30,6 +30,12 @@ final class Opslag {
         String koppelRol = "";
         boolean bijnaam = false;
         int commandoVersie = 0;
+        // spraakgroepen
+        boolean groepenAan = false;
+        String lobby = "";
+        boolean groepBuurt = true, groepEiland = true, groepTeam = true, groepZichtbaar = true;
+        /** Tijdelijke spraakkanalen die Meldly maakte: kanaal-id -> groepsleutel (bijv. team:draken). */
+        final Map<String, String> groepKanalen = new java.util.concurrent.ConcurrentHashMap<>();
         final Map<Categorie, CatInst> cats = new EnumMap<>(Categorie.class);
         GuildInst(String id) {
             this.id = id;
@@ -37,7 +43,7 @@ final class Opslag {
         }
         CatInst cat(Categorie c) { return cats.get(c); }
         boolean ietsAan() {
-            if (koppelAan) return true;
+            if (koppelAan || groepenAan) return true;
             for (CatInst c : cats.values()) if (c.aan) return true;
             return false;
         }
@@ -79,6 +85,14 @@ final class Opslag {
             gi.koppelRol = g.getString("koppelen.rol", "");
             gi.bijnaam = g.getBoolean("koppelen.bijnaam", false);
             gi.commandoVersie = g.getInt("commando-versie", 0);
+            gi.groepenAan = g.getBoolean("groepen.aan", false);
+            gi.lobby = g.getString("groepen.lobby", "");
+            gi.groepBuurt = g.getBoolean("groepen.in-de-buurt", true);
+            gi.groepEiland = g.getBoolean("groepen.eiland", true);
+            gi.groepTeam = g.getBoolean("groepen.team", true);
+            gi.groepZichtbaar = g.getBoolean("groepen.zichtbaar", true);
+            ConfigurationSection gk = g.getConfigurationSection("groepen.kanalen");
+            if (gk != null) for (String k : gk.getKeys(false)) gi.groepKanalen.put(k, gk.getString(k, ""));
             for (Categorie c : Categorie.values()) {
                 ConfigurationSection cs = g.getConfigurationSection("categorieen." + c.sleutel);
                 if (cs == null) continue;
@@ -106,6 +120,13 @@ final class Opslag {
             y.set(p + "koppelen.aan", g.koppelAan);
             y.set(p + "koppelen.rol", g.koppelRol);
             y.set(p + "koppelen.bijnaam", g.bijnaam);
+            y.set(p + "groepen.aan", g.groepenAan);
+            y.set(p + "groepen.lobby", g.lobby);
+            y.set(p + "groepen.in-de-buurt", g.groepBuurt);
+            y.set(p + "groepen.eiland", g.groepEiland);
+            y.set(p + "groepen.team", g.groepTeam);
+            y.set(p + "groepen.zichtbaar", g.groepZichtbaar);
+            for (Map.Entry<String, String> e : g.groepKanalen.entrySet()) y.set(p + "groepen.kanalen." + e.getKey(), e.getValue());
             for (Categorie c : Categorie.values()) {
                 CatInst ci = g.cat(c);
                 String q = p + "categorieen." + c.sleutel + ".";
