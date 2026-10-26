@@ -1,5 +1,5 @@
 {
-  "bijgewerkt": "2026-10-22",
+  "bijgewerkt": "2026-10-26",
   "plugins": [
     {
       "naam": "Vaulty",
@@ -52,9 +52,9 @@
     },
     {
       "naam": "Ritly",
-      "versie": "1.0.0",
-      "bestand": "Ritly-1.0.0.jar",
-      "sha1": "f4a01e9003dff947865932e7c390900e547492d2",
+      "versie": "1.0.1",
+      "bestand": "Ritly-1.0.1.jar",
+      "sha1": "b4a4f61db45ba9005f89572b2e275563f704edc2",
       "minecraft": "26.2"
     }
   ]

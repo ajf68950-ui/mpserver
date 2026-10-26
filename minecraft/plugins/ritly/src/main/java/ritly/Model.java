@@ -26,6 +26,7 @@ final class Model {
         final boolean lak;          // krijgt de lakkleur
         final char draai;           // 'x' = wiel, 'z' = propeller, 0 = niet
         final Quaternionf vast;     // vaste schuine stand (rond het midden van het deel)
+        Vector3f om;                // draaipunt voor draai:x / draai:z (bijv. midden van het wiel); null = midden van het deel
         private final Map<DyeColor, BlockData> perKleur = new EnumMap<>(DyeColor.class);
         private BlockData basis;
 
@@ -66,6 +67,7 @@ final class Model {
             for (float f : new float[]{van.x, van.y, van.z, van.x + maat.x, van.y + maat.y, van.z + maat.z})
                 sb.append(' ').append(rond(f));
             if (draai != 0) sb.append(" draai:").append(draai);
+            if (om != null) sb.append(" om:").append(rond(om.x)).append(',').append(rond(om.y)).append(',').append(rond(om.z));
             return sb.toString();
         }
 
@@ -78,18 +80,25 @@ final class Model {
             Vector3f b = new Vector3f(Math.max(g[0], g[3]), Math.max(g[1], g[4]), Math.max(g[2], g[5]));
             char draai = 0;
             float rx = 0, ry = 0, rz = 0;
+            Vector3f om = null;
             for (int i = 7; i < t.length; i++) {
                 String v = t[i].toLowerCase(Locale.ROOT);
                 if (v.startsWith("draai:") && v.length() > 6) draai = v.charAt(6);
                 else if (v.startsWith("rx:")) rx = Float.parseFloat(v.substring(3));
                 else if (v.startsWith("ry:")) ry = Float.parseFloat(v.substring(3));
                 else if (v.startsWith("rz:")) rz = Float.parseFloat(v.substring(3));
+                else if (v.startsWith("om:")) {
+                    String[] o = v.substring(3).split(",");
+                    if (o.length == 3) om = new Vector3f(Float.parseFloat(o[0]), Float.parseFloat(o[1]), Float.parseFloat(o[2]));
+                }
             }
             Quaternionf q = null;
             if (rx != 0 || ry != 0 || rz != 0)
                 q = new Quaternionf().rotationYXZ((float) Math.toRadians(ry), (float) Math.toRadians(rx), (float) Math.toRadians(rz));
             String blok = t[0].toLowerCase(Locale.ROOT).replace("minecraft:", "");
-            return new Deel(blok, a, b.sub(a, new Vector3f()), draai == 'x' || draai == 'z' ? draai : 0, q);
+            Deel d = new Deel(blok, a, b.sub(a, new Vector3f()), draai == 'x' || draai == 'z' ? draai : 0, q);
+            d.om = om;
+            return d;
         }
     }
 

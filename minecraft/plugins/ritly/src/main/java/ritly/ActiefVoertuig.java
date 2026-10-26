@@ -275,11 +275,18 @@ final class ActiefVoertuig {
 
     private Transformation transformatie(Model.Deel d, Quaternionf q, float spin) {
         Vector3f o = m.zitten.get(0);
-        Quaternionf l = new Quaternionf(q);
+        Quaternionf s = new Quaternionf();
+        if (d.draai == 'x') s.rotationX(spin);
+        else if (d.draai == 'z') s.rotationZ(spin);
+        // l = Q * S * V: eerst de vaste stand, dan het draaien (rond het draaipunt), dan het hele voertuig
+        Quaternionf l = new Quaternionf(q).mul(s);
         if (d.vast != null) l.mul(d.vast);
-        if (d.draai == 'x') l.rotateX(spin);
-        else if (d.draai == 'z') l.rotateZ(spin);
-        Vector3f c = new Vector3f(d.van).add(d.maat.x / 2f, d.maat.y / 2f, d.maat.z / 2f).sub(o);
+        Vector3f c = new Vector3f(d.van).add(d.maat.x / 2f, d.maat.y / 2f, d.maat.z / 2f);
+        if (d.om != null && d.draai != 0) {
+            Vector3f p = new Vector3f(d.om);
+            c = s.transform(c.sub(p)).add(p);
+        }
+        c.sub(o);
         q.transform(c);
         Vector3f half = l.transform(new Vector3f(d.maat).mul(0.5f));
         return new Transformation(c.sub(half), l, new Vector3f(d.maat), new Quaternionf());
@@ -327,7 +334,9 @@ final class ActiefVoertuig {
             Model.Deel d = m.delen.get(i);
             if (d.draai == 'x' && Math.abs(snelheid) > 0.001 && (opGrond || m.soort != Soort.VLIEGTUIG)) {
                 float straal = Math.max(0.1f, d.maat.y / 2f);
-                hoek[i] += (float) (snelheid / straal);
+                // met een draaipunt (midden van het wiel) is de straal de hoogte van dat punt: het wiel staat op de grond
+                float r = d.om != null ? Math.max(0.1f, d.om.y) : straal;
+                hoek[i] += (float) ActiefVoertuig.clamp(snelheid / r, -0.3, 0.3);
                 draaitIets = true;
             } else if (d.draai == 'z' && (gas > 0.01 || (m.soort != Soort.VLIEGTUIG && Math.abs(snelheid) > 0.01))) {
                 hoek[i] += (float) (0.35 + gas * 0.6);
